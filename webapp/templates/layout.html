@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <title>{% block title %}openbikebox Backend{% endblock %}</title>
+    {% block head %}
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <meta name="description" content="{% block meta_description %}{% endblock %}"/>
+        <meta name="publisher" content="openbikebox"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <meta property="og:title" content="openbikebox Backend">
+        <meta property="og:type" content="website"/>
+        <meta property="og:url" content="{{ config['PROJECT_URL'] }}{{ request.path }}"/>
+        <meta property="og:description" content="openbikebox Backend" />
+    {% endblock %}
+
+    {% block styles %}
+        {% if static_content %}
+            <link rel="stylesheet" type="text/css" href="{{ static_content['main']['css'] }}">
+        {% endif %}
+    {% endblock %}
+</head>
+<body class="{% block bodyclass %}default{% endblock %}">
+<div id="header-wrapper" class="main-wrapper">
+    {% block header %}
+    {% endblock %}
+</div>
+<div id="content-wrapper" class="main-wrapper">
+    <div id="content" class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
+</div>
+
+<div id="footer-wrapper" class="main-wrapper">
+    {% block footer %}
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <p>
+                        <a href="https://openbikebox.de">Buchungs-Website</a> |
+                        <a href="https://openbikebox.de/datenschutzerklaerung/">Datenschutz</a> |
+                        <a href="https://openbikebox.de/impressum/">Impressum</a>
+                    </p>
+                    <p id="footer-status-line">
+                        openbikebox Backend Version {{ config['PROJECT_VERSION'] }} was made with 💚 in the ruhr area and has 🦋-wings to fly.
+                    </p>
+                </div>
+            </div>
+        </div>
+    {% endblock %}
+</div>
+{% block scripts %}
+    {% if static_content %}
+        <script type="text/javascript" src="{{ static_content['main']['js'] }}"></script>
+    {% endif %}
+{% endblock %}
+<!-- software development by binary butterfly GmbH -->
+</body>
+</html>

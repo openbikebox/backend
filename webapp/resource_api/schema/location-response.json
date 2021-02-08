@@ -1,0 +1,297 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Location",
+  "type": "object",
+  "description": "single location",
+  "properties": {
+    "created": {
+      "type": "string",
+      "format": "date-time",
+      "description": "created at datetime"
+    },
+    "modified": {
+      "type": "string",
+      "format": "date-time",
+      "description": "modified at datetime"
+    },
+    "name": {
+      "type": "string",
+      "maxLength": 255,
+      "description": "public name"
+    },
+    "slug": {
+      "type": "string",
+      "maxLength": 255,
+      "description": "slug"
+    },
+    "lat": {
+      "type": "string",
+      "pattern": "^[+-]?\\d+(\\.\\d+)?$",
+      "description": "lat"
+    },
+    "lon": {
+      "type": "string",
+      "pattern": "^[+-]?\\d+(\\.\\d+)?$",
+      "description": "lon"
+    },
+    "address": {
+      "type": "string",
+      "maxLength": 255,
+      "description": "street and number"
+    },
+    "postalcode": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 5,
+      "description": "postalcode"
+    },
+    "locality": {
+      "type": "string",
+      "maxLength": 255,
+      "description": "locality"
+    },
+    "country": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 2,
+      "description": "ISO 3166-1 alpha-2 country code of operator"
+    },
+    "description": {
+      "type": "string",
+      "description": "public description"
+    },
+    "photo": {
+      "type": "object",
+      "description": "photo",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "unique id of this photo"
+        },
+        "id_url": {
+          "type": "string",
+          "description": "unique url for this photo"
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time",
+          "description": "created at datetime"
+        },
+        "modified": {
+          "type": "string",
+          "format": "date-time",
+          "description": "modified at datetime"
+        },
+        "url": {
+          "type": "string",
+          "description": "url where photo can be downloaded"
+        },
+        "mimteype": {
+          "type": "string",
+          "description": "mimetype of this photo",
+          "enum": ["image/jpeg", "image/png", "image/svg+xml"]
+        }
+      }
+    },
+    "operator": {
+      "type": "object",
+      "description": "operator of this location",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "unique operator id"
+        },
+        "id_url": {
+          "type": "string",
+          "description": "unique url for this operator"
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time",
+          "description": "created at datetime"
+        },
+        "modified": {
+          "type": "string",
+          "format": "date-time",
+          "description": "modified at datetime"
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 255,
+          "description": "name of operator (usually company name)"
+        },
+        "description": {
+          "type": "string",
+          "description": "description of operator"
+        },
+        "address": {
+          "type": "string",
+          "maxLength": 255,
+          "description": "street and street number of operator"
+        },
+        "postalcode": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 5,
+          "description": "postalcode of operator"
+        },
+        "locality": {
+          "type": "string",
+          "maxLength": 255,
+          "description": "locality of operator"
+        },
+        "country": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 2,
+          "description": "ISO 3166-1 alpha-2 country code of operator"
+        },
+        "logo": {
+          "type": "object",
+          "description": "logo of operator",
+          "properties": {
+            "id": {
+              "type": "integer",
+              "description": "unique id of this logo"
+            },
+            "id_url": {
+              "type": "string",
+              "description": "unique url for this logo"
+            },
+            "created": {
+              "type": "string",
+              "format": "date-time",
+              "description": "created at datetime"
+            },
+            "modified": {
+              "type": "string",
+              "format": "date-time",
+              "description": "modified at datetime"
+            },
+            "url": {
+              "type": "string",
+              "description": "url where logo can be downloaded"
+            },
+            "mimetype": {
+              "type": "string",
+              "description": "mimetype of this logo",
+              "enum": ["image/jpeg", "image/png", "image/svg+xml"]
+            }
+          }
+        }
+      }
+    },
+    "resource": {
+      "type": "array",
+      "description": "all resources with any status",
+      "items": {
+        "type": "object",
+        "description": "resource object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "unique resource id"
+          },
+          "id_url": {
+            "type": "string",
+            "description": "unique url for this resource"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time",
+            "description": "created at datetime"
+          },
+          "modified": {
+            "type": "string",
+            "format": "date-time",
+            "description": "modified at datetime"
+          },
+          "slug": {
+            "type": "string",
+            "maxLength": 255,
+            "description": "unique slug for resource"
+          },
+          "identifier": {
+            "type": "string",
+            "maxLength": 255,
+            "description": "user readable identifier for resource, usually not longer then 3 chars"
+          },
+          "maintenance_from": {
+            "type": "string",
+            "format": "date-time",
+            "description": "planned maintenance begin of this resource"
+          },
+          "maintenance_till": {
+            "type": "string",
+            "format": "date-time",
+            "description": "planned maintenance end of this resource"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["free", "taken", "reserved", "inactive", "faulted"],
+            "description": "status of resource"
+          },
+          "installed_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "datetime when resource was installed"
+          },
+          "unavailable_until": {
+            "type": "string",
+            "format": "date-time",
+            "description": "datetime until when the resource will be booked. this parameter will be replaced by a more dynamic concept in a later version"
+          },
+          "pricegroup": {
+            "type": "object",
+            "description": "pricegroup used at this resource",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "description": "unique pricegroup id"
+              },
+              "id_url": {
+                "type": "string",
+                "description": "unique url for this pricegroup"
+              },
+              "created": {
+                "type": "string",
+                "format": "date-time",
+                "description": "created at datetime"
+              },
+              "modified": {
+                "type": "string",
+                "format": "date-time",
+                "description": "modified at datetime"
+              },
+              "fee_hour": {
+                "type": "string",
+                "maxLength": 8,
+                "description": "fee by hour including taxes as a string representation of an decimal value with precision 7 and scale 4"
+              },
+              "fee_day": {
+                "type": "string",
+                "maxLength": 8,
+                "description": "fee by day including taxes as a string representation of an decimal value with precision 7 and scale 4"
+              },
+              "fee_week": {
+                "type": "string",
+                "maxLength": 8,
+                "description": "fee by week including taxes as a string representation of an decimal value with precision 7 and scale 4"
+              },
+              "fee_month": {
+                "type": "string",
+                "maxLength": 8,
+                "description": "fee by month including taxes as a string representation of an decimal value with precision 7 and scale 4"
+              },
+              "fee_year": {
+                "type": "string",
+                "maxLength": 8,
+                "description": "fee by year including taxes as a string representation of an decimal value with precision 7 and scale 4"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

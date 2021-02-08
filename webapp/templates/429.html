@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Zu viele Anfragen</h1>
+            <p>
+                Es wurden zu viele Anfragen pro Sekunde gesendet. Da dies bei einer normalen Nutzung nicht geschieht, gibt
+                es zwei Möglichkeiten:
+            </p>
+            <ul>
+                <li>
+                    openbikebox hat einen Fehler. Die openbikebox Admins sind bereits informiert, und wir werden den Fehler
+                    zeitnah beheben.
+                </li>
+                <li>
+                    Der Schutz funktioniert wie erwartet und es sind tatsächlich zu viele (oder die falschen) Anfragen.
+                    In diesem Fall ein Rat, liebes Scriptkiddie: hör auf, irgendwelche "Haxx0r-Toolz" aus dem Netz zu
+                    laden und lerne, wie man Angriffe zielgerichtet macht, so dass sie nicht gar so schnell auffallen.
+                    Und bevor Du dich auf den Weg machst, lies dir mal
+                    <a href="https://www.ccc.de/de/hackerethik">diese schönen Grundlagen</a> durch. Danke.
+                </li>
+            </ul>
+        </div>
+    </div>
+{% endblock %}

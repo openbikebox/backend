@@ -1,0 +1,116 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "request reply",
+  "type": "object",
+  "description": "the action as a reply on an reservation request",
+  "properties": {
+    "created": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC creation datetime"
+    },
+    "modified": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC last modified datetime"
+    },
+    "uid": {
+      "type": "string",
+      "maxLength": 64,
+      "description": "global unique identifier for this action"
+    },
+    "request_uid": {
+      "type": "string",
+      "maxLength": 64,
+      "description": "the request uid"
+    },
+    "requested_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "the UTC moment when the user reserved"
+    },
+    "booked_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "the UTC moment when the user booked"
+    },
+    "begin": {
+      "type": "string",
+      "format": "date-time",
+      "description": "begin of booking"
+    },
+    "end": {
+      "type": "string",
+      "format": "date-time",
+      "description": "end of booking"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["booked"],
+      "description": "reservation"
+    },
+    "value_gross": {
+      "type": "string",
+      "pattern": "^[+-]?\\d+(\\.\\d+)?$",
+      "description": "value with tax"
+    },
+    "value_net": {
+      "type": "string",
+      "pattern": "^[+-]?\\d+(\\.\\d+)?$",
+      "description": "value without tax"
+    },
+    "value_tax": {
+      "type": "string",
+      "pattern": "^[+-]?\\d+(\\.\\d+)?$",
+      "description": "tax value"
+    },
+    "tax_rate": {
+      "type": "string",
+      "pattern": "^[+-]?\\d+(\\.\\d+)?$",
+      "description": "tax rate"
+    },
+    "operator": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "name of the operator of this resource"
+        }
+      }
+    },
+    "resource": {
+      "type": "object",
+      "properties": {
+        "identifier": {
+          "type": "string",
+          "description": "identifier of this resource"
+        }
+      }
+    },
+    "location": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "id of booked location"
+        },
+        "name": {
+          "type": "string",
+          "description": "name of booked location"
+        },
+        "slug": {
+          "type": "string",
+          "description": "slug of booked location"
+        },
+        "lat": {
+          "type": "number",
+          "description": "lat of booked location"
+        },
+        "lon": {
+          "type": "number",
+          "description": "lat of booked location"
+        }
+      }
+    }
+  }
+}

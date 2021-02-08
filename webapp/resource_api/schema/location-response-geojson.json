@@ -1,0 +1,103 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "geojson which describes the locations of all resources of an location",
+  "type": "object",
+  "description": "feature collection",
+  "required": [
+    "type",
+    "features"
+  ],
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": ["FeatureCollection"]
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "type",
+          "geometry",
+          "properties"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "Feature"
+            ]
+          },
+          "geometry": {
+            "type": "object",
+            "required": [
+              "type",
+              "coordinates"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["Polygon"]
+              },
+              "coordinates": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 1,
+                "items": {
+                  "type": "array",
+                  "minItems": 5,
+                  "maxItems": 5,
+                  "items": {
+                    "type": "array",
+                    "minItems": 2,
+                    "maxItems": 2,
+                    "items": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "properties": {
+            "type": "object",
+            "required": [
+              "id",
+              "identifier",
+              "status"
+            ],
+            "properties": {
+              "id": {
+                "type": "integer",
+                "description": "id of location"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "free",
+                  "taken",
+                  "reserved",
+                  "inactive",
+                  "faulted"
+                ],
+                "description": "status of resource"
+              },
+              "identifier": {
+                "type": "string",
+                "description": "user readable identifier for resource, usually not longer then 3 chars"
+              },
+              "pricegroup_id": {
+                "type": "integer",
+                "description": "pricegroup id"
+              },
+              "hardware_id": {
+                "type": "integer",
+                "description": "hardware id"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

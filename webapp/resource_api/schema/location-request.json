@@ -1,0 +1,15 @@
+{
+  "$id": "http://schema.openbikebox.de/location.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "location",
+  "description": "this is the request to get a single location.",
+  "type": "object",
+  "required": [],
+  "properties": {
+    "format": {
+      "type": "string",
+      "enum": ["list", "svg", "geojson"],
+      "default": "list"
+    }
+  }
+}

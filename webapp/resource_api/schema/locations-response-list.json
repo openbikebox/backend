@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Location list",
+  "type": "array",
+  "description": "location list",
+  "items": {
+    "type": "object",
+    "required": [
+      "name",
+      "slug",
+      "lat",
+      "lon"
+    ],
+    "properties": {
+      "id": {
+        "type": "integer",
+        "description": "id of location"
+      },
+      "id_url": {
+        "type": "string",
+        "description": "unique identifier url of location"
+      },
+      "name": {
+        "type": "string",
+        "maxLength": 255,
+        "description": "public name of location"
+      },
+      "slug": {
+        "type": "string",
+        "maxLength": 255,
+        "description": "slug of location"
+      },
+      "lat": {
+        "type": "number",
+        "description": "lat of location"
+      },
+      "lon": {
+        "type": "number",
+        "description": "lon of location"
+      },
+      "ressource_count": {
+        "type": "number",
+        "description": "resource count. warning: this property will be removed in further development"
+      },
+      "photo": {
+        "type": "object",
+        "description": "photo",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "unique id of this photo"
+          },
+          "modified": {
+            "type": "string",
+            "format": "date-time",
+            "description": "modified at datetime"
+          },
+          "url": {
+            "type": "string",
+            "description": "url where photo can be downloaded"
+          },
+          "mimteype": {
+            "type": "string",
+            "description": "mimetype of this photo",
+            "enum": ["image/jpeg", "image/png", "image/svg+xml"]
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "$id": "http://schema.openbikebox.de/action-reservation-request.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "reservation request",
+  "description": "this is the initial request sent to the booking system. usually its done when a customer puts something in her cart.",
+  "type": "object",
+  "required": [
+    "request_uid",
+    "resource_id",
+    "requested_at",
+    "begin",
+    "end"
+  ],
+  "properties": {
+    "begin": {
+      "description": "utc begin of the rent",
+      "format": "date-time",
+      "type": "string"
+    },
+    "end": {
+      "description": "utc end of the rent",
+      "format": "date-time",
+      "type": "string"
+    },
+    "request_uid": {
+      "description": "this uid is the client side identifier for the whole transaction",
+      "minLength": 16,
+      "type": "string"
+    },
+    "requested_at": {
+      "description": "the utc moment when the reservation was created",
+      "format": "date-time",
+      "type": "string"
+    },
+    "resource_id": {
+      "description": "the identifier of the ressource",
+      "minimum": 1,
+      "type": "integer"
+    }
+  }
+}
