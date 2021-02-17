@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "request reply",
   "type": "object",
-  "description": "the action as a reply on an reservation request",
+  "description": "the action as a reply on an cancel request",
   "properties": {
     "created": {
       "type": "string",
@@ -47,7 +47,7 @@
     "status": {
       "type": "string",
       "enum": ["cancelled"],
-      "description": "reservation"
+      "description": "action status"
     },
     "value_gross": {
       "type": "string",

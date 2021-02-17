@@ -86,13 +86,7 @@ class ReserveForm(FlaskForm, SchemaForm):
     )
 
 
-class CancelForm(FlaskForm, SchemaForm):
-    class Meta:
-        csrf = False
-        schema_id = 'action-cancel'
-        schema_title = 'cancel'
-        schema_description = 'this is the request which is sent when the customer cancels a reservation.'
-
+class BaseUpdateForm(FlaskForm, SchemaForm):
     uid = StringField(
         label='uid',
         validators=[
@@ -116,7 +110,23 @@ class CancelForm(FlaskForm, SchemaForm):
     )
 
 
-class BookingForm(FlaskForm, SchemaForm):
+class CancelForm(BaseUpdateForm):
+    class Meta:
+        csrf = False
+        schema_id = 'action-cancel'
+        schema_title = 'cancel'
+        schema_description = 'this is the request which is sent when the customer cancels a reservation.'
+
+
+class RenewForm(BaseUpdateForm):
+    class Meta:
+        csrf = False
+        schema_id = 'action-renew'
+        schema_title = 'renew'
+        schema_description = 'this is the request which is sent when the customer renews a reservation.'
+
+
+class BookingForm(BaseUpdateForm):
     class Meta:
         csrf = False
         schema_id = 'action-book'

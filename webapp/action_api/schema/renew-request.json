@@ -1,8 +1,8 @@
 {
-  "$id": "http://schema.openbikebox.de/action-cancel-request.schema.json",
+  "$id": "http://schema.openbikebox.de/action-renew-request.schema.json",
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "cancel request",
-  "description": "this is the request which is sent when the customer cancelled a reservation.",
+  "title": "book request",
+  "description": "this is the request which is sent when the customer renews a reservation.",
   "type": "object",
   "required": [
     "uid",
