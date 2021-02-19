@@ -119,9 +119,10 @@ def action_cancel():
     db.session.add(action)
 
     resource = action.resource
-    resource.status = ResourceStatus.free
-    resource.unavailable_until = None
-    db.session.add(resource)
+    if resource.status == ResourceStatus.reserved:
+        resource.status = ResourceStatus.free
+        resource.unavailable_until = None
+        db.session.add(resource)
 
     db.session.commit()
     return jsonify({
@@ -223,7 +224,6 @@ def action_book():
         })
     form.populate_obj(action)
     action.status = ActionStatus.booked
-
 
     resource.status = ResourceStatus.taken
     resource.unavailable_until = action.end
