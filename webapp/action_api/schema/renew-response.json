@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "request reply",
   "type": "object",
-  "description": "the action as a reply on an reservation request",
+  "description": "the action as a reply on an renew request",
   "properties": {
     "created": {
       "type": "string",
@@ -24,20 +24,15 @@
       "maxLength": 64,
       "description": "the request uid"
     },
-    "session": {
-      "type": "string",
-      "maxLength": 64,
-      "description": "a session token which is used for updating this specific session"
-    },
     "requested_at": {
       "type": "string",
       "format": "date-time",
       "description": "the UTC moment when the user reserved"
     },
-    "valid_till": {
+    "booked_at": {
       "type": "string",
       "format": "date-time",
-      "description": "the UTC datetime when the reservation gets invalid"
+      "description": "the UTC moment when the user booked"
     },
     "begin": {
       "type": "string",

@@ -22,7 +22,7 @@ import os
 from datetime import datetime, timedelta
 from flask import Blueprint, current_app, jsonify, request
 from ..models import Action, Resource
-from .ActionForms import ReserveForm, BookingForm, CancelForm
+from .ActionForms import ReserveForm, BookingForm, CancelForm, RenewForm
 from ..extensions import csrf, db, api_documentation, auth
 from ..common.exceptions import BikeBoxAccessDeniedException, BikeBoxNotExistingException
 from ..common.enum import ActionStatus, ResourceStatus
@@ -119,8 +119,60 @@ def action_cancel():
     db.session.add(action)
 
     resource = action.resource
-    resource.status = ResourceStatus.free
-    resource.unavailable_until = None
+    if resource.status == ResourceStatus.reserved:
+        resource.status = ResourceStatus.free
+        resource.unavailable_until = None
+        db.session.add(resource)
+
+    db.session.commit()
+    return jsonify({
+        'status': 0,
+        'data': action.to_dict(extended=True, remove_none=True)
+    })
+
+
+@action_api.route('/api/action/renew', methods=['POST'])
+@api_documentation.register(
+    summary='renews a resource reservation',
+    tags=[EndpointTag.booking],
+    request_schema=os.path.join(os.path.dirname(os.path.realpath(__file__)), 'schema', 'renew-request.json'),
+    response_schema=os.path.join(os.path.dirname(os.path.realpath(__file__)), 'schema', 'renew-response.json'),
+    basic_auth=True
+)
+@auth.login_required()
+@csrf.exempt
+def action_renew():
+    form = RenewForm(data=request.json)
+    if not form.validate():
+        return jsonify({
+            'status': -1,
+            'errors': form.errors
+        })
+    try:
+        action = Action.apiget(form.uid.data, form.request_uid.data, form.session.data)
+    except BikeBoxNotExistingException:
+        return jsonify({
+            'status': -1,
+            'error': 'action does not exist'
+        })
+    if action.status == ActionStatus.booked:
+        return jsonify({
+            'status': -1,
+            'error': 'action already booked'
+        })
+    resource = action.resource
+    if resource.status not in [ResourceStatus.free, ResourceStatus.reserved]:
+        return jsonify({
+            'status': -1,
+            'error': 'resource not free'
+        })
+
+    action.valid_till = datetime.utcnow() + timedelta(minutes=current_app.config['RESERVE_MINUTES'])
+    action.status = ActionStatus.reserved
+    db.session.add(action)
+
+    resource.status = ResourceStatus.reserved
+    resource.unavailable_until = datetime.utcnow() + timedelta(minutes=current_app.config['RESERVE_MINUTES'])
     db.session.add(resource)
 
     db.session.commit()
@@ -159,15 +211,20 @@ def action_book():
             'status': -1,
             'error': 'invalid credentials'
         })
-    if action.status != ActionStatus.reserved:
+    if action.status not in [ActionStatus.reserved, ActionStatus.cancelled]:
         return jsonify({
             'status': -1,
             'error': 'action already booked'
         })
+    resource = action.resource
+    if resource.status not in [ResourceStatus.free, ResourceStatus.reserved]:
+        return jsonify({
+            'status': -1,
+            'error': 'resource not free'
+        })
     form.populate_obj(action)
     action.status = ActionStatus.booked
 
-    resource = action.resource
     resource.status = ResourceStatus.taken
     resource.unavailable_until = action.end
     db.session.add(resource)
