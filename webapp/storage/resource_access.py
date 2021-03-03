@@ -30,4 +30,4 @@ class ResourceAccess(db.Model, BaseModel):
     location_id = db.Column(db.BigInteger, db.ForeignKey('location.id', use_alter=True), info={'description': 'location id'})
 
     internal_identifier = db.Column(db.String(255), info={'description': 'internal identifier'})
-    salt = db.Column(db.String(16))
+    salt = db.Column(db.String(255))
