@@ -19,6 +19,7 @@ from flask_migrate import Migrate, MigrateCommand
 from webapp.common.prepare_unittest import prepare_unittest as prepare_unittest_run
 from webapp.resource_backend.ResourceBackendWorker import fill_location as fill_location_run
 from webapp.resource_backend.ResourceResetWorker import free_resource_worker as free_resource_worker_run
+from webapp.common.reputation import reputation_heartbeat as reputation_heartbeat_run
 
 
 app = launch()
@@ -48,16 +49,38 @@ def free_resource_worker():
 
 
 @manager.command
-def fill_location(location_id, pricegroup_id, resource_group_id, resource_access_id, hardware_id, x, y, counter_length):
+def reputation_heartbeat():
+    """
+    should run every five minutes
+    """
+    reputation_heartbeat_run()
+
+
+@manager.command
+def fill_location(
+        location_id,
+        pricegroup_id,
+        resource_group_id,
+        resource_access_id,
+        hardware_id,
+        start_x,
+        start_y,
+        max_x,
+        max_y,
+        counter_length,
+        space_direction):
     fill_location_run(
         int(location_id),
         int(pricegroup_id),
         int(resource_group_id),
         int(resource_access_id),
         int(hardware_id),
-        int(x),
-        int(y),
-        int(counter_length)
+        int(start_x),
+        int(start_y),
+        int(max_x),
+        int(max_y),
+        int(counter_length),
+        space_direction
     )
 
 

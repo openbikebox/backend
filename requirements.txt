@@ -9,7 +9,6 @@ Flask-Mail
 Flask-Celery-Helper
 Flask-Babel
 Flask-Failsafe
-Flask-Babel
 Flask-Redis
 Flask-CORS
 Flask-HTTPAuth

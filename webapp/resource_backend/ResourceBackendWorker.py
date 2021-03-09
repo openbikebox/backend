@@ -32,18 +32,21 @@ def fill_location(
         resource_group_id: int,
         resource_access_id: int,
         hardware_id: int,
-        x: int = 5,
-        y: int = 10,
-        counter_length: int = 3):
-    counter = 1
+        start_x: int = 0,
+        start_y: int = 0,
+        max_x: int = 5,
+        max_y: int = 10,
+        counter_length: int = 3,
+        space_direction: str = 'x'):
+    counter = Resource.query.filter_by(resource_group_id=resource_group_id).count() + 1
     location = Location.query.get(location_id)
     hardware = Hardware.query.get(hardware_id)
     pricegroup = Pricegroup.query.get(pricegroup_id)
     resource_group = ResourceGroup.query.get(resource_group_id)
     resource_access = ResourceAccess.query.get(resource_access_id)
 
-    for i in range(0, x):
-        for j in range(0, y):
+    for i in range(start_x, start_x + max_x):
+        for j in range(start_y, start_y + max_y):
             resource = Resource()
             resource.location_id = location.id
             resource.resource_access_id = resource_access.id
@@ -53,10 +56,10 @@ def fill_location(
             resource.slug = str(uuid4())
             resource.status = ResourceStatus.free
             resource.installed_at = datetime.utcnow()
-            resource.polygon_bottom = j
-            resource.polygon_top = j + 1
-            resource.polygon_left = ceil(i * 1.5)
-            resource.polygon_right = ceil(i * 1.5) + 1
+            resource.polygon_bottom = ceil(j * 1.5) if space_direction == 'y' else j
+            resource.polygon_top = (ceil(j * 1.5) if space_direction == 'y' else j) + 1
+            resource.polygon_left = ceil(i * 1.5) if space_direction == 'x' else i
+            resource.polygon_right = (ceil(i * 1.5) if space_direction == 'x' else i) + 1
             resource.user_identifier = ("%0" + str(counter_length) + "d") % counter
             resource.internal_identifier = ("%0" + str(counter_length) + "d") % counter
             db.session.add(resource)

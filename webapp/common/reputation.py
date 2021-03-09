@@ -25,6 +25,9 @@ from ..extensions import redis, logger
 
 def reputation_add(count: int) -> None:
     user_identifier = md5(request.headers.get('X-Forwarded-For', 'none').encode()).hexdigest()
+    if user_identifier in current_app.config.get('TRUSTED_IPS', []):
+        logger.info('reputation', 'reputation not increased because %s is a trustworthy IP' % request.remote_addr)
+        return
     old_count = redis.hget('reputation', user_identifier)
     if not old_count:
         old_count = 0
