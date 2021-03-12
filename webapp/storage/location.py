@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from lxml import etree
+from flask import current_app
 from ..extensions import db
 from .base import BaseModel
 
@@ -44,6 +45,12 @@ class Location(db.Model, BaseModel):
     locality = db.Column(db.String(255), info={'description': 'locality'})
     country = db.Column(db.String(2), info={'description': 'country'})
     description = db.Column(db.Text, info={'description': 'public description'})
+
+    osm_id = db.Column(db.BigInteger, info={'description': 'openstreetmap id'})
+
+    @property
+    def booking_url(self) -> str:
+        return '%s/location/%s' % (current_app.config['FRONTEND_URL'], self.slug)
 
     @property
     def polygon_geojson(self) -> dict:

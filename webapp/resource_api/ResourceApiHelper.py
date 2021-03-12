@@ -48,9 +48,13 @@ def locations_geojson(locations: List[Location]) -> dict:
 def locations_list(locations: List[Location]):
     result = []
     for location in locations:
-        location_dict = location.to_dict(fields=['id', 'id_url', 'lat', 'lon', 'name', 'slug'], remove_none=True)
+        location_dict = location.to_dict(
+            fields=['id', 'id_url', 'lat', 'lon', 'name', 'slug', 'osm_id'],
+            remove_none=True
+        )
         location_dict['photo'] = location.photo.to_dict(fields=['id', 'modified', 'url', 'mimetype'], remove_none=True)
         location_dict['ressource_count'] = location.resource.count()
+        location_dict['booking_url'] = location.booking_url
         result.append(location_dict)
     return result
 
@@ -61,6 +65,7 @@ def get_location_reply(location: Location):
     if request.args.get('format') == 'geojson':
         return jsonify(location.polygon_geojson)
     result = location.to_dict(remove_none=True)
+    result['booking_url'] = location.booking_url
     result['photo'] = location.photo.to_dict(
         fields=['id', 'id_url', 'created', 'modified', 'url', 'mimetype'],
         remove_none=True

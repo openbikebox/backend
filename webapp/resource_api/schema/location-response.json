@@ -24,6 +24,15 @@
       "maxLength": 255,
       "description": "slug"
     },
+    "booking_url": {
+      "type": "string",
+      "maxLength": 255,
+      "description": "deeplink to booking site for user"
+    },
+    "osm_id": {
+      "type": "integer",
+      "description": "openstreetmap id"
+    },
     "lat": {
       "type": "string",
       "pattern": "^[+-]?\\d+(\\.\\d+)?$",
