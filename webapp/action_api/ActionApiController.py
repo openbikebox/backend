@@ -32,7 +32,7 @@ from ..api_documentation.ApiDocumentation import EndpointTag
 action_api = Blueprint('action_api', __name__, template_folder='templates')
 
 
-@action_api.route('/api/action/reserve', methods=['POST'])
+@action_api.route('/api/v1/action/reserve', methods=['POST'])
 @api_documentation.register(
     summary='reserve an resource',
     tags=[EndpointTag.booking],
@@ -80,7 +80,7 @@ def action_reserve():
     })
 
 
-@action_api.route('/api/action/cancel', methods=['POST'])
+@action_api.route('/api/v1/action/cancel', methods=['POST'])
 @api_documentation.register(
     summary='cancel a resource reservation',
     tags=[EndpointTag.booking],
@@ -131,7 +131,7 @@ def action_cancel():
     })
 
 
-@action_api.route('/api/action/renew', methods=['POST'])
+@action_api.route('/api/v1/action/renew', methods=['POST'])
 @api_documentation.register(
     summary='renews a resource reservation',
     tags=[EndpointTag.booking],
@@ -182,7 +182,7 @@ def action_renew():
     })
 
 
-@action_api.route('/api/action/book', methods=['POST'])
+@action_api.route('/api/v1/action/book', methods=['POST'])
 @api_documentation.register(
     summary='book a resource reservation',
     tags=[EndpointTag.booking],
@@ -201,7 +201,6 @@ def action_book():
         })
     # TODO: use new validation system to prevent manual check
     token_check_data = request.json
-    print(token_check_data)
     if 'token' not in token_check_data \
             or not len(token_check_data['token']) \
             or 'identifier' not in token_check_data['token'][0] \

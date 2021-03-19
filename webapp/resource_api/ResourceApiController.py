@@ -30,7 +30,7 @@ from ..api_documentation.ApiDocumentation import EndpointTag
 resource_api = Blueprint('resource_api', __name__, template_folder='templates')
 
 
-@resource_api.route('/api/locations')
+@resource_api.route('/api/v1/locations')
 @api_documentation.register(
     summary='getting aggregated information about locations',
     tags=[EndpointTag.information],
@@ -57,7 +57,7 @@ def api_locations_geojson():
     return jsonify_success(locations_list(locations))
 
 
-@resource_api.route('/api/location/<int:location_id>')
+@resource_api.route('/api/v1/location/<int:location_id>')
 @api_documentation.register(
     summary='getting detail information about a single by id',
     tags=[EndpointTag.information],
@@ -89,7 +89,7 @@ def api_location(location_id):
     return get_location_reply(location)
 
 
-@resource_api.route('/api/location')
+@resource_api.route('/api/v1/location')
 @api_documentation.register(
     summary='getting detail information about a single by other parameters',
     tags=[EndpointTag.information],
