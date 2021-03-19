@@ -103,6 +103,8 @@ class Action(db.Model, BaseModel):
 
     @property
     def code(self) -> Union[str, None]:
+        if self.status != ActionStatus.booked:
+            return None
         return self.generate_code()
 
     def generate_code(self):
@@ -162,7 +164,11 @@ class Action(db.Model, BaseModel):
     def to_dict(self, *args, extended: bool = False, **kwargs) -> dict:
         result = super().to_dict(*args, **kwargs)
         if self.code:
-            result['code'] = self.code
+            result['token'] = [{
+                'type': 'code',
+                'identifier': self.pin,
+                'secret': self.code
+            }]
         if extended:
             if self.resource:
                 result['resource'] = {'identifier': self.resource.user_identifier}
@@ -176,4 +182,5 @@ class Action(db.Model, BaseModel):
                     fields=['name'],
                     remove_none=kwargs.get('remove_none', False)
                 )
+        print(result)
         return result

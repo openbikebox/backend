@@ -28,8 +28,8 @@ class JsonCharge(unittest.TestCase):
         request_uid = str(uuid4())
         reserve_result = self.json_request('%s/api/action/reserve' % self.config.PROJECT_URL, {
             'request_uid': request_uid,
-            'location_id': randint(1, 1024),
-            'box_id': randint(1, 1024),
+            'location_id': randint(1, 6),
+            'resource_id': randint(1, 1000),
             'requested_at': datetime.utcnow(),
             'begin': datetime.utcnow().replace(second=0) + timedelta(hours=1),
             'end': (datetime.utcnow().replace(second=0) + timedelta(hours=randint(2, 48)))
@@ -42,7 +42,11 @@ class JsonCharge(unittest.TestCase):
             'uid': uid,
             'request_uid': request_uid,
             'session': session,
-            'paid_at': datetime.utcnow()
+            'paid_at': datetime.utcnow(),
+            'token': [{
+                'type': 'code',
+                'identifier': '1234'
+            }]
         })
         print(book_result)
         assert book_result['status'] == 0
@@ -54,5 +58,10 @@ class JsonCharge(unittest.TestCase):
         headers.update({
             'Content-Type': 'application/json'
         })
-        r = requests.post(url, data=json.dumps(data, cls=DefaultJSONEncoder), headers=headers)
+        r = requests.post(
+            url,
+            data=json.dumps(data, cls=DefaultJSONEncoder),
+            headers=headers,
+            auth=('unittest', 'unittest')
+        )
         return r.json()

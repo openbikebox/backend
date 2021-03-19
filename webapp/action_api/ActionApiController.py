@@ -199,6 +199,19 @@ def action_book():
             'status': -1,
             'errors': form.errors
         })
+    # TODO: use new validation system to prevent manual check
+    token_check_data = request.json
+    print(token_check_data)
+    if 'token' not in token_check_data \
+            or not len(token_check_data['token']) \
+            or 'identifier' not in token_check_data['token'][0] \
+            or 'type' not in token_check_data['token'][0] \
+            or token_check_data['token'][0]['type'] != 'code' \
+            or len(token_check_data['token'][0]['identifier']) != 4:
+        return jsonify({
+            'status': -1,
+            'error': 'invalid token'
+        })
     try:
         action = Action.apiget(form.uid.data, form.request_uid.data, form.session.data)
     except BikeBoxNotExistingException:
@@ -223,6 +236,7 @@ def action_book():
             'error': 'resource not free'
         })
     form.populate_obj(action)
+    action.pin = token_check_data['token'][0]['identifier']
     action.status = ActionStatus.booked
 
     resource.status = ResourceStatus.taken

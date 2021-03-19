@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from flask_wtf import FlaskForm
 from wtforms import validators
-from wtforms import IntegerField, StringField
+from wtforms import IntegerField, StringField, FieldList, FormField
 from ..common.form import SchemaForm
 from ..common.form_validator import ValidateDateTime, ValidateDateTimeRange
 from ..common.form_field import DateTimeField
@@ -164,9 +164,5 @@ class BookingForm(BaseUpdateForm):
         ],
         description='the utc moment when the payment was done'
     )
-    pin = StringField(
-        label='PIN',
-        validators=[
-            validators.Length(min=4, max=4)
-        ]
-    )
+
+

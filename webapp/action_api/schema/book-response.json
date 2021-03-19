@@ -78,6 +78,33 @@
         }
       }
     },
+    "token": {
+      "type": "array",
+      "description": "all valid token for this action",
+      "items": {
+        "type": "object",
+        "description": "an access token",
+        "required": [
+          "type",
+          "identifier"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["code"],
+            "description": "token type. additional token types may be added in future."
+          },
+          "identifier": {
+            "type": "string",
+            "description": "token identifier, the meaning will depend on token type. for token type 'code', the identifier in the pin"
+          },
+          "secret": {
+            "type": "string",
+            "description": "an additional token secret if necessary. in case of token type 'code', this is the code."
+          }
+        }
+      }
+    },
     "resource": {
       "type": "object",
       "properties": {
