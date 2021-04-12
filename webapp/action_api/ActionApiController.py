@@ -63,7 +63,11 @@ def action_reserve():
     action = Action()
     form.populate_obj(action)
     action.set_cache(resource)
-    action.calculate()
+    if not action.calculate():
+        return jsonify({
+            'status': -1,
+            'errors': 'price not set for this daterange'
+        })
     action.valid_till = datetime.utcnow() + timedelta(minutes=current_app.config['RESERVE_MINUTES'])
 
     resource.status = ResourceStatus.reserved

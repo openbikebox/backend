@@ -76,13 +76,16 @@ class Action(db.Model, BaseModel):
         self.uid = str(uuid4())
         self.session = get_passcode(64)
 
-    def calculate(self):
+    def calculate(self) -> bool:
         if not self.resource or not self.operator or not self.begin or not self.end:
-            return
+            return False
         self.value_gross = getattr(self.pricegroup, 'fee_%s' % Pricegroup.get_timespan(self.begin, self.end))
+        if not self.value_gross:
+            return False
         self.tax_rate = self.operator.tax_rate
         self.value_tax = self.value_gross / (1 + self.tax_rate) * self.tax_rate
         self.value_net = self.value_gross - self.value_tax
+        return True
 
     def set_cache(self, resource: Resource):
         self.resource_id = resource.id
