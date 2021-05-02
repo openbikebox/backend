@@ -18,34 +18,18 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-# Flask-SQLAlchemy extension instance
 from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
-# Flask-Login
-from flask_login import LoginManager
-login_manager = LoginManager()
-
-# Flask-WTF csrf protection
-from flask_wtf.csrf import CSRFProtect
-csrf = CSRFProtect()
-
-# Flask-Mail
 from flask_mail import Mail
 mail = Mail()
 
-# Flask-Babel
-from flask_babel import Babel
-babel = Babel()
-
-# Celery
 from .common.celery import LogErrorsCelery
 celery = LogErrorsCelery()
 
 from flask_cors import CORS
 cors = CORS()
 
-# Redis
 from flask_redis import FlaskRedis
 redis = FlaskRedis()
 
@@ -57,5 +41,4 @@ logger = Logger()
 
 from .api_documentation.ApiDocumentation import ApiDocumentation
 api_documentation = ApiDocumentation()
-
 

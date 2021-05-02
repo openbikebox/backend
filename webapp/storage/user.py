@@ -19,34 +19,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import json
-from hashlib import sha256
 from passlib.hash import bcrypt
-from typing import Tuple, Optional, List
-from itsdangerous import URLSafeTimedSerializer
-from flask import current_app, render_template
-from flask_mail import Message
-from flask_login import login_user, UserMixin
-from flask_login import AnonymousUserMixin
-from ..extensions import login_manager
-
-from ..extensions import db, mail
+from typing import List
+from ..extensions import db
 from .base import BaseModel
 
 
-class AnonymousUser(AnonymousUserMixin):
-    id = None
-    states = []
-
-    def has_capability(self, capability: str) -> bool:
-        return False
-
-
-login_manager.anonymous_user = AnonymousUser
-
-
-class User(db.Model, BaseModel, UserMixin):
+class User(db.Model, BaseModel):
     __tablename__ = 'user'
-    _description = 'Ein Nutzer'
 
     operator_id = db.Column(db.BigInteger, db.ForeignKey('operator.id', use_alter=True), info={'description': 'operator id'})
 
@@ -97,63 +77,6 @@ class User(db.Model, BaseModel, UserMixin):
         if self.password is None:
             return False
         return bcrypt.verify(password, self.password)
-
-    @classmethod
-    def authenticate(self, email: str, password: str, remember: bool) -> Tuple['User', bool]:
-        user = User.query.filter(User.email == email).first()
-
-        if user:
-            authenticated = user.check_password(password)
-            if authenticated:
-                login_user(user, remember=bool(remember))
-        else:
-            authenticated = False
-        return user, authenticated
-
-    @classmethod
-    def email_exists(self, email: str, exclude_id: Optional[int] = None) -> bool:
-        user = User.query.filter_by(email=email)
-        if exclude_id:
-            user = user.filter(User.id != exclude_id)
-        return user.count() > 0
-
-    def send_validation_email(self) -> None:
-        recover_serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
-        validation_url = "%s/validate-email?id=%s" % (
-            current_app.config['PROJECT_URL'],
-            recover_serializer.dumps(
-                [self.id, sha256(str.encode(self.password)).hexdigest()],
-                salt=current_app.config['SECURITY_PASSWORD_SALT']
-            )
-        )
-        if self.status == 'pre-registered-start':
-            template = 'emails/validate-email-pre-register.txt'
-        else:
-            template = 'emails/validate-email.txt'
-        msg = Message(
-            "Bitte bestätigen Sie kurz Ihre Anmeldung",
-            sender=current_app.config['MAILS_FROM'],
-            recipients=[self.email],
-            body=render_template(template, user=self, validation_url=validation_url)
-        )
-        mail.send(msg)
-
-    def send_recover_email(self) -> None:
-        recover_serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
-        validation_url = "%s/recover-check?id=%s" % (
-            current_app.config['PROJECT_URL'],
-            recover_serializer.dumps(
-                [self.id, sha256(str.encode(self.password)).hexdigest()],
-                salt=current_app.config['SECURITY_PASSWORD_SALT']
-            )
-        )
-        msg = Message(
-            "Ihr Passwort soll geändert werden",
-            sender=current_app.config['MAILS_FROM'],
-            recipients=[self.email],
-            body=render_template('emails/recover-email.txt', user=self, validation_url=validation_url)
-        )
-        mail.send(msg)
 
     def _get_capabilities(self) -> List[str]:
         if not self._capabilities:

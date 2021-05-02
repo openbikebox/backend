@@ -27,7 +27,6 @@ import datetime
 from dateutil.parser import parse as dateutil_parse
 from urllib.parse import quote_plus
 from flask import current_app
-from flask_babel import _
 from .misc import DefaultJSONEncoder
 
 
@@ -115,7 +114,7 @@ def register_global_filters(app):
             result += ":%02d" % math.floor(value % 60)
 
         if format == 'medium':
-            result += ' ' + _('Stunden')
+            result += ' ' + 'Stunden'
         return result
 
     @app.template_filter('filter_list')

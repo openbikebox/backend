@@ -29,7 +29,7 @@ class Config(BaseConfig):
     MAILS_FROM = 'no-reply@openbikebox.de'
 
     SECRET_KEY = 'please-insert-random-key'
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:root@mysql/open-bike-box-backend'
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://please-insert-user:please-insert-password@mysql/please-insert-database'
 
     MAIL_SERVER = 'please-insert-mail-hostname'
     MAIL_USERNAME = 'please-insert-mail-user'

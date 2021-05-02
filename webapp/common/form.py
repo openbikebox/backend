@@ -20,8 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from typing import List
 from flask import current_app
-from flask_wtf import FlaskForm
-from flask_babel import _
 from wtforms import IntegerField, SelectField, SubmitField, StringField, IntegerField, FloatField
 from wtforms import validators
 from ..common.form_field import DateTimeField

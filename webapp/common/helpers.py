@@ -107,3 +107,27 @@ def localize_datetime(value: datetime) -> Union[datetime, None]:
     if not value:
         return
     return pytz.UTC.localize(value).astimezone(pytz.timezone('Europe/Berlin'))
+
+
+def get_now() -> datetime:
+    """
+    helper which normally gives back current utc datetime, but can be modified for tests
+    :return: utc datetime
+    """
+    return datetime.utcnow()
+
+
+def get_today() -> date:
+    """
+    helper which normally gives back today, but can be modified for tests
+    :return: today
+    """
+    return date.today()
+
+
+def is_offline() -> bool:
+    """
+    helper which normally gives status online, but can be modified for tests
+    :return: today
+    """
+    return False

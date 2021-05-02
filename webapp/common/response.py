@@ -34,21 +34,23 @@ def json_response(data_dict, cors=False):
     return response
 
 
-def jsonify_success(data: Union[dict, list, str], count: Optional[int] = None) -> Response:
-    result = {
-        'status': 0,
-        'data': data
-    }
+def success_response(data: Union[dict, list, str], count: Optional[int] = None) -> dict:
+    result = {'status': 0, 'data': data}
     if count is not None:
         result['count'] = count
-    return jsonify(result)
+    return result
+
+
+def jsonify_success(data: Union[dict, list, str], count: Optional[int] = None) -> Response:
+    return jsonify(success_response(data, count))
+
+
+def error_response(error: Union[dict, list, str] = 'common') -> dict:
+    return {'status': -1, 'error': error}
 
 
 def jsonify_error(error: Union[dict, list, str] = 'common') -> Response:
-    return jsonify({
-        'status': -1,
-        'error': error
-    })
+    return jsonify(error_response(error))
 
 
 def svg_response(xml_tree):

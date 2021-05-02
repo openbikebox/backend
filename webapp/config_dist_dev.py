@@ -33,8 +33,7 @@ class Config(BaseConfig):
 
     SECRET_KEY = 'please-insert-random-key'
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:root@mysql/open-bike-box-backend'
-    SQLALCHEMY_POOL_SIZE = 100
-    SQLALCHEMY_POOL_RECYCLE = 600
+    SQLALCHEMY_ENGINE_OPTIONS = {'pool_size': 100, 'pool_recycle': 600}
 
     MAIL_SERVER = 'please-insert-mail-hostname'
     MAIL_USERNAME = 'please-insert-mail-user'

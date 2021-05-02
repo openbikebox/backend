@@ -22,17 +22,15 @@ import os
 import traceback
 from hashlib import sha256
 from flask import Flask, request, render_template, session, jsonify
-from flask_wtf.csrf import CSRFError
 
 from .config import Config
 from .common.constants import BaseConfig
 from .common.filter import register_global_filters
-from .extensions import db, login_manager, csrf, mail, celery, babel, redis, cors, auth
+from .extensions import db, mail, celery, redis, cors, auth
 from .models import User
 
 # Blueprints
 from .frontend import frontend
-from .user import user
 from .action_api import action_api
 from .resource_api import resource_api
 from .api_documentation.Controller import api_documentation_blueprint
@@ -41,7 +39,6 @@ __all__ = ['launch']
 
 BLUEPRINTS = [
     frontend,
-    user,
     action_api,
     resource_api,
     api_documentation_blueprint
@@ -76,24 +73,6 @@ def configure_app(app):
 def configure_extensions(app):
     db.init_app(app)
 
-    @login_manager.user_loader
-    def load_user(user_id):
-        emulate_id = session.get('emulate-user-id')
-        if emulate_id:
-            user_check = User.query.get(user_id)
-            if user_check.has_capability('admin'):
-                return User.query.get(emulate_id)
-            return None
-        return User.query.get(user_id)
-
-    from .storage.user import AnonymousUser
-    login_manager.anonymous_user = AnonymousUser
-    login_manager.init_app(app)
-
-    @login_manager.unauthorized_handler
-    def unauthorized(msg=None):
-        return render_template('401.html'), 401
-
     @auth.verify_password
     def verify_password(username, password):
         if username not in app.config['BASICAUTH'] or not password:
@@ -101,12 +80,10 @@ def configure_extensions(app):
         if sha256(password.encode()).hexdigest() == app.config['BASICAUTH'][username]:
             return username
 
-    csrf.init_app(app)
     cors.init_app(app)
     mail.init_app(app)
     celery.init_app(app)
     redis.init_app(app)
-    babel.init_app(app)
 
 
 def configure_blueprints(app):
@@ -178,12 +155,6 @@ def configure_error_handlers(app):
         if request.path.startswith('/api'):
             return jsonify({'status': -1, 'code': 500})
         return render_template('500.html'), 500
-
-    @app.errorhandler(CSRFError)
-    def handle_csrf_error(e):
-        if request.path.startswith('/api'):
-            return jsonify({'status': -1, 'code': 400})
-        return render_template('csrf-error.html', reason=e.description), 400
 
     if not app.config['DEBUG']:
         @app.errorhandler(Exception)

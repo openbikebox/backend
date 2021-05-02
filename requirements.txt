@@ -3,11 +3,9 @@ Flask
 Flask-SQLAlchemy
 Flask-Script
 Flask-Migrate
-Flask-WTF
-Flask-Login
 Flask-Mail
+Flask-WTF
 Flask-Celery-Helper
-Flask-Babel
 Flask-Failsafe
 Flask-Redis
 Flask-CORS
@@ -19,8 +17,5 @@ bcrypt
 redis
 requests
 pymysql
-cryptography
-eventlet
 email_validator
-eralchemy
 lxml
