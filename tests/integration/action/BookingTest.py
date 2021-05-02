@@ -22,7 +22,7 @@ from uuid import uuid4
 from random import randint
 from datetime import datetime, timedelta
 
-from ..helper.BaseIntegrationTestCase import BaseIntegrationTestCase
+from tests.integration.helper.BaseIntegrationTestCase import BaseIntegrationTestCase
 
 from webapp.action_api.ActionApiHandler import action_reserve_handler, action_book_handler
 from webapp.models import Resource
