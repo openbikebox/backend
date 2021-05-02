@@ -36,6 +36,10 @@
       "description": "the identifier of the ressource",
       "minimum": 1,
       "type": "integer"
+    },
+    "user_identifier": {
+      "description": "optional client user identifier",
+      "type": "string"
     }
   }
 }

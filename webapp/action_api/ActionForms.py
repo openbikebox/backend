@@ -84,6 +84,7 @@ class ReserveForm(FlaskForm, SchemaForm):
         ],
         description='utc end of the rent'
     )
+    user_identifier = StringField()
 
 
 class BaseUpdateForm(FlaskForm, SchemaForm):
@@ -164,5 +165,6 @@ class BookingForm(BaseUpdateForm):
         ],
         description='the utc moment when the payment was done'
     )
+    user_identifier = StringField()
 
 

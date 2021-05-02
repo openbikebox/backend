@@ -40,6 +40,8 @@ class Action(db.Model, BaseModel):
     uid = db.Column(db.String(64), nullable=False, unique=True, info={'description': ''})
     request_uid = db.Column(db.String(64), nullable=False, info={'description': ''})
     session = db.Column(db.String(64), nullable=False, info={'description': ''})
+    source = db.Column(db.String(128), index=True)
+    user_identifier = db.Column(db.String(255))
 
     resource_id = db.Column(db.BigInteger)
     _resource = None
