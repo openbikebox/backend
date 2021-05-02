@@ -168,12 +168,13 @@ class Action(db.Model, BaseModel):
 
     def to_dict(self, *args, extended: bool = False, **kwargs) -> dict:
         result = super().to_dict(*args, **kwargs)
-        if self.code:
-            result['token'] = [{
-                'type': 'code',
-                'identifier': self.pin,
-                'secret': self.code
-            }]
+        result['token'] = [{
+            'type': 'code',
+            'identifier': self.pin,
+            'secret': self.code if self.code else '00000'
+        }]
+        if 'pin' in result:
+            del result['pin']
         if extended:
             if self.resource:
                 result['resource'] = {'identifier': self.resource.user_identifier}
