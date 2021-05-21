@@ -22,7 +22,9 @@ import os
 from flask import Blueprint,  jsonify, request
 from ..extensions import api_documentation, auth
 from ..api_documentation.ApiDocumentation import EndpointTag
-from .ActionApiHandler import action_reserve_handler, action_cancel_handler, action_renew_handler, action_book_handler
+from .ActionApiHandler import action_reserve_handler, action_cancel_handler, action_renew_handler, \
+    action_book_handler, action_extend_handler
+from ..common.response import log_request
 
 action_api = Blueprint('action_api', __name__, template_folder='templates')
 
@@ -36,6 +38,7 @@ action_api = Blueprint('action_api', __name__, template_folder='templates')
     basic_auth=True
 )
 @auth.login_required()
+@log_request()
 def action_reserve():
     return jsonify(action_reserve_handler(request.json, auth.username()))
 
@@ -49,6 +52,7 @@ def action_reserve():
     basic_auth=True
 )
 @auth.login_required()
+@log_request()
 def action_cancel():
     return jsonify(action_cancel_handler(request.json, auth.username()))
 
@@ -62,6 +66,7 @@ def action_cancel():
     basic_auth=True
 )
 @auth.login_required()
+@log_request()
 def action_renew():
     return jsonify(action_renew_handler(request.json, auth.username()))
 
@@ -75,5 +80,20 @@ def action_renew():
     basic_auth=True
 )
 @auth.login_required()
+@log_request()
 def action_book():
     return action_book_handler(request.json, auth.username())
+
+
+@action_api.route('/api/v1/action/extend', methods=['POST'])
+@api_documentation.register(
+    summary='extend a resource reservation',
+    tags=[EndpointTag.booking],
+    request_schema=os.path.join(os.path.dirname(os.path.realpath(__file__)), 'schema', 'extend-request.json'),
+    response_schema=os.path.join(os.path.dirname(os.path.realpath(__file__)), 'schema', 'extend-response.json'),
+    basic_auth=True
+)
+@auth.login_required()
+@log_request()
+def action_extend():
+    return action_extend_handler(request.json, auth.username())

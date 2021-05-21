@@ -61,6 +61,7 @@ class BaseConfig:
     MAIL_USE_TLS = True
 
     BASICAUTH = {}
+    BASICAUTH_CAPABILITIES = {}
     TRUSTED_IPS = []
 
     OPENAPI_CONTACT_MAIL = 'info@openbikebox.de'

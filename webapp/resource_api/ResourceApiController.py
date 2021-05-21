@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 from flask import Blueprint, jsonify, abort, request
 from flask_cors import cross_origin
-from ..common.response import jsonify_success
+from ..common.response import jsonify_success, log_request
 from ..models import Location
 from ..extensions import api_documentation
 from .ResourceApiHelper import locations_geojson, get_location_reply, locations_list
@@ -51,7 +51,10 @@ resource_api = Blueprint('resource_api', __name__, template_folder='templates')
 )
 @cross_origin()
 def api_locations_geojson():
-    locations = Location.query.all()
+    locations = Location.query
+    if request.args.get('operator.id', type=int, default=0):
+        locations = locations.filter_by(operator_id=request.args.get('operator.id', type=int))
+    locations = locations.all()
     if request.args.get('format') == 'geojson':
         return jsonify(locations_geojson(locations))
     return jsonify_success(locations_list(locations))

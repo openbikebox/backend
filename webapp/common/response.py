@@ -22,7 +22,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import json
 from lxml import etree
 from typing import Union, Optional
-from flask import make_response, jsonify, Response
+from functools import update_wrapper
+from flask import make_response, jsonify, Response, request
+from ..extensions import logger
 from .helpers import DefaultJSONEncoder
 
 
@@ -42,7 +44,8 @@ def success_response(data: Union[dict, list, str], count: Optional[int] = None) 
 
 
 def jsonify_success(data: Union[dict, list, str], count: Optional[int] = None) -> Response:
-    return jsonify(success_response(data, count))
+    response = success_response(data, count)
+    return jsonify(response)
 
 
 def error_response(error: Union[dict, list, str] = 'common') -> dict:
@@ -50,10 +53,32 @@ def error_response(error: Union[dict, list, str] = 'common') -> dict:
 
 
 def jsonify_error(error: Union[dict, list, str] = 'common') -> Response:
-    return jsonify(error_response(error))
+    response = error_response(error)
+    return jsonify(response)
 
 
 def svg_response(xml_tree):
     response = make_response(etree.tostring(xml_tree, pretty_print=False, encoding='UTF-8', xml_declaration=True))
     response.mimetype = 'image/svg+xml'
     return response
+
+
+def log_request(log_file: str = 'requests'):
+    def decorator(fn):
+        def wrapped_function(*args, **kwargs):
+            if request.data:
+                logger.info(log_file, '>> %s' % json.dumps(request.json, cls=DefaultJSONEncoder, sort_keys=True, indent=2))
+            result = fn(*args, **kwargs)
+            if isinstance(result, Response):
+                logger.info(log_file, '<< %s' % result.get_data(True))
+            elif type(result) is dict or type(result) is list:
+                logger.info(log_file, '<< %s' % json.dumps(result, cls=DefaultJSONEncoder))
+            else:
+                logger.info(log_file, '<< invalid response type %s' % type(result))
+            return result
+
+        return update_wrapper(wrapped_function, fn)
+
+    return decorator
+
+

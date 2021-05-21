@@ -168,3 +168,74 @@ class BookingForm(BaseUpdateForm):
     user_identifier = StringField()
 
 
+class ExtendForm(FlaskForm, SchemaForm):
+    class Meta:
+        csrf = False
+        schema_id = 'action-extend'
+        schema_title = 'book'
+        schema_description = 'this is the request which is sent when wants to extend a reservation.'
+
+    old_uid = StringField(
+        label='uid',
+        validators=[
+            validators.DataRequired()
+        ],
+        description='unique transaction identifier provided at reservation'
+    )
+    old_request_uid = StringField(
+        label='request uid',
+        validators=[
+            validators.DataRequired()
+        ],
+        description='this uid is the client side identifier for the whole transaction'
+    )
+    old_session = StringField(
+        label='session',
+        validators=[
+            validators.DataRequired()
+        ],
+        description='session string provided at reservation'
+    )
+    request_uid = StringField(
+        label='request uid',
+        validators=[
+            validators.DataRequired()
+        ],
+        description='this uid is the client side identifier for the whole transaction'
+    )
+    requested_at = DateTimeField(
+        label='requested_at',
+        validators=[
+            validators.DataRequired(),
+            ValidateDateTime(),
+            ValidateDateTimeRange(plus=120, minus=120)
+        ],
+        filters=[
+            normalize_utc
+        ],
+        description='the utc moment when the reservation was created'
+    )
+    begin = DateTimeField(
+        label='begin',
+        validators=[
+            validators.Optional(),
+            ValidateDateTime()
+        ],
+        filters=[
+            normalize_utc
+        ],
+        description='utc begin of the rent. if not set the old daterange will be used.'
+    )
+    end = DateTimeField(
+        label='end',
+        validators=[
+            validators.Optional(),
+            ValidateDateTime()
+        ],
+        filters=[
+            normalize_utc
+        ],
+        description='utc end of the rent. if not set the old daterange will be used.'
+    )
+    user_identifier = StringField()
+

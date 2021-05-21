@@ -188,5 +188,4 @@ class Action(db.Model, BaseModel):
                     fields=['name'],
                     remove_none=kwargs.get('remove_none', False)
                 )
-        print(result)
         return result

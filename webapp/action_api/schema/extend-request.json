@@ -1,0 +1,49 @@
+{
+  "$id": "http://schema.openbikebox.de/action-book-request.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "book request",
+  "description": "this is the request which is sent when the customer paid a reservation.",
+  "type": "object",
+  "required": [
+    "uid",
+    "request_uid",
+    "session"
+  ],
+  "properties": {
+    "requested_at": {
+      "description": "the utc moment when the reservation was created",
+      "format": "date-time",
+      "type": "string"
+    },
+    "request_uid": {
+      "description": "this uid is the client side identifier for the whole transaction",
+      "type": "string"
+    },
+    "old_request_uid": {
+      "description": "this uid is the client side identifier for the whole transaction",
+      "type": "string"
+    },
+    "old_session": {
+      "description": "session string provided at reservation",
+      "type": "string"
+    },
+    "old_uid": {
+      "description": "unique transaction identifier provided at reservation",
+      "type": "string"
+    },
+    "begin": {
+      "description": "utc begin of the rent",
+      "format": "date-time",
+      "type": "string"
+    },
+    "end": {
+      "description": "utc end of the rent",
+      "format": "date-time",
+      "type": "string"
+    },
+    "user_identifier": {
+      "description": "optional client user identifier",
+      "type": "string"
+    }
+  }
+}

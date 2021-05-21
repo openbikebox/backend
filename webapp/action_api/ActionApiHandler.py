@@ -28,7 +28,7 @@ from ..common.enum import ActionStatus, ResourceStatus
 from ..common.helpers import get_now
 from ..common.exceptions import BikeBoxAccessDeniedException, BikeBoxNotExistingException
 from .ActionApiHelper import check_reservation_timeout
-from .ActionForms import ReserveForm, BookingForm, CancelForm, RenewForm
+from .ActionForms import ReserveForm, BookingForm, CancelForm, RenewForm, ExtendForm
 
 
 def action_reserve_handler(data: dict, source: str) -> dict:
@@ -38,6 +38,8 @@ def action_reserve_handler(data: dict, source: str) -> dict:
     resource = Resource.query.get(form.resource_id.data)
     if not resource:
         return error_response('invalid resource')
+    if resource.location.operator.id not in current_app.config['BASICAUTH'][source]['capabilities']:
+        return error_response('client is not allowed to book the resource')
     if resource.status != ResourceStatus.free:
         return error_response('resource not free')
     action = Action()
@@ -98,7 +100,7 @@ def action_renew_handler(data: dict, source: str) -> dict:
     if action.source != source:
         return error_response('invalid source')
     resource = action.resource
-    if resource.status not in [ResourceStatus.free, ResourceStatus.reserved]:
+    if resource.status not in [ResourceStatus.free, ResourceStatus.reserved] and resource.unavailable_until > action.begin:
         return error_response('resource not free')
 
     action.valid_till = get_now() + timedelta(minutes=current_app.config['RESERVE_MINUTES'])
@@ -137,7 +139,7 @@ def action_book_handler(data: dict, source: str) -> dict:
     if action.source != source:
         return error_response('invalid source')
     resource = action.resource
-    if resource.status not in [ResourceStatus.free, ResourceStatus.reserved]:
+    if resource.status not in [ResourceStatus.free, ResourceStatus.reserved] and resource.unavailable_until > action.begin:
         return error_response('resource not free')
     form.populate_obj(action)
     if 'identifier' in data['token'][0] and data['token'][0]['identifier'] is not None:
@@ -152,5 +154,37 @@ def action_book_handler(data: dict, source: str) -> dict:
 
     db.session.add(action)
     db.session.commit()
+
+    return success_response(action.to_dict(extended=True, remove_none=True))
+
+
+def action_extend_handler(data: dict, source: str):
+    form = ExtendForm(data=data)
+    if not form.validate():
+        return error_response(form.errors)
+    try:
+        old_action = Action.apiget(form.old_uid.data, form.old_request_uid.data, form.old_session.data)
+    except BikeBoxNotExistingException:
+        return error_response('action does not exist')
+
+    if old_action.status != ActionStatus.booked:
+        return error_response('old action was not booked')
+    if old_action.end < get_now():
+        return error_response('old action already ended')
+
+    action = Action()
+    form.populate_obj(action)
+    if not form.begin.data or not form.end.data:
+        action.begin = old_action.end
+        action.end = action.begin + (old_action.end - old_action.begin)
+    action.set_cache(old_action.resource)
+    if not action.calculate():
+        return error_response('price not set for this daterange')
+    action.valid_till = get_now() + timedelta(minutes=current_app.config['RESERVE_MINUTES'])
+    action.source = source
+    db.session.add(action)
+    db.session.commit()
+
+    check_reservation_timeout.apply_async((action.resource_id, action.id), countdown=60 * current_app.config['RESERVE_MINUTES'])
 
     return success_response(action.to_dict(extended=True, remove_none=True))

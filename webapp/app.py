@@ -77,7 +77,7 @@ def configure_extensions(app):
     def verify_password(username, password):
         if username not in app.config['BASICAUTH'] or not password:
             return None
-        if sha256(password.encode()).hexdigest() == app.config['BASICAUTH'][username]:
+        if sha256(password.encode()).hexdigest() == app.config['BASICAUTH'][username]['password']:
             return username
 
     cors.init_app(app)
