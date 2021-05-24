@@ -39,9 +39,9 @@ Antwort:
     "end": "2021-05-25T22:00:00Z",
     "status": "reserved",
     "value_gross": "1.0000",
-    "value_net": "0.8621",
-    "value_tax": "0.1379",
-    "tax_rate": "0.1600",
+    "value_net": "0.8403",
+    "value_tax": "0.1597",
+    "tax_rate": "0.1900",
     "token": [
       {
         "type": "code",
@@ -55,8 +55,8 @@ Antwort:
     },
     "location": {
       "id": 1,
-      "name": "Fahrrad-Station Dortmund",
-      "slug": "fahrrad-station-dortmund",
+      "name": "Fahrrad-Station Beispielstadt",
+      "slug": "fahrrad-station-beispielstadt",
       "lat": 51.517477,
       "lon": 7.460547
     },
