@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from typing import Union
 from uuid import uuid4
-from datetime import datetime
+from datetime import datetime, timedelta
 from ..extensions import db
 from .base import BaseModel
 from ..common.enum import ActionStatus
@@ -171,7 +171,8 @@ class Action(db.Model, BaseModel):
         result['token'] = [{
             'type': 'code',
             'identifier': self.pin,
-            'secret': self.code if self.code else '00000'
+            'secret': self.code if self.code else '00000',
+            'date': (self.end - timedelta(hours=3)).strftime('%Y%m%d')
         }]
         if 'pin' in result:
             del result['pin']

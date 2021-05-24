@@ -109,6 +109,12 @@ def localize_datetime(value: datetime) -> Union[datetime, None]:
     return pytz.UTC.localize(value).astimezone(pytz.timezone('Europe/Berlin'))
 
 
+def unlocalize_datetime(value: datetime) -> Union[datetime, None]:
+    if not value:
+        return
+    return pytz.timezone('Europe/Berlin').localize(value).astimezone(pytz.UTC)
+
+
 def get_now() -> datetime:
     """
     helper which normally gives back current utc datetime, but can be modified for tests

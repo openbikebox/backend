@@ -7,19 +7,22 @@
   "required": [
     "request_uid",
     "resource_id",
-    "requested_at",
-    "begin",
-    "end"
+    "requested_at"
   ],
   "properties": {
     "begin": {
-      "description": "utc begin of the rent",
+      "description": "utc begin of the rent. either begin and end or predefined_range is required.",
       "format": "date-time",
       "type": "string"
     },
     "end": {
-      "description": "utc end of the rent",
+      "description": "utc end of the rent. either begin and end or predefined_range is required.",
       "format": "date-time",
+      "type": "string"
+    },
+    "predefined_daterange": {
+      "description": "a predefined daterange in order to let the backend calculate begin and end. either begin and end or predefined_range is required.",
+      "enum": ["day", "week", "month", "year"],
       "type": "string"
     },
     "request_uid": {

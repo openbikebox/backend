@@ -101,6 +101,10 @@
           "secret": {
             "type": "string",
             "description": "an additional token secret if necessary. in case of token type 'code', this is the code."
+          },
+          "date": {
+            "type": "string",
+            "description": "if token type is 'code', the field 'date' will have a preformated date string for the end user"
           }
         }
       }

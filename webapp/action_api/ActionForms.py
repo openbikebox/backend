@@ -62,10 +62,17 @@ class ReserveForm(FlaskForm, SchemaForm):
         ],
         description='the utc moment when the reservation was created'
     )
+    predefined_daterange = StringField(
+        label='predefined range',
+        validators=[
+            validators.Optional(),
+            validators.AnyOf(['day', 'week', 'month', 'year'])
+        ]
+    )
     begin = DateTimeField(
         label='begin',
         validators=[
-            validators.DataRequired(),
+            validators.Optional(),
             ValidateDateTime()
         ],
         filters=[
@@ -76,7 +83,7 @@ class ReserveForm(FlaskForm, SchemaForm):
     end = DateTimeField(
         label='end',
         validators=[
-            validators.DataRequired(),
+            validators.Optional(),
             ValidateDateTime()
         ],
         filters=[

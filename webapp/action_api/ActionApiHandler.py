@@ -25,7 +25,7 @@ from ..extensions import db
 from ..models import Action, Resource
 from ..common.response import error_response, success_response
 from ..common.enum import ActionStatus, ResourceStatus
-from ..common.helpers import get_now
+from ..common.helpers import get_now, get_current_time_local, unlocalize_datetime
 from ..common.exceptions import BikeBoxAccessDeniedException, BikeBoxNotExistingException
 from .ActionApiHelper import check_reservation_timeout
 from .ActionForms import ReserveForm, BookingForm, CancelForm, RenewForm, ExtendForm
@@ -42,6 +42,19 @@ def action_reserve_handler(data: dict, source: str) -> dict:
         return error_response('client is not allowed to book the resource')
     if resource.status != ResourceStatus.free:
         return error_response('resource not free')
+    if not (form.predefined_daterange.data or (form.begin.data and form.end.data)):
+        return error_response('either begin + end or predefined_daterange is required')
+    if form.predefined_daterange.data:
+        begin = get_current_time_local().replace(microsecond=0)
+        form.begin.data = unlocalize_datetime(begin).strftime('%Y-%m-%dT%H:%M:%SZ')
+        if form.predefined_daterange.data == 'day':
+            form.end.data = unlocalize_datetime((begin + timedelta(days=2)).replace(hour=0, minute=0, second=0)).strftime('%Y-%m-%dT%H:%M:%SZ')
+        elif form.predefined_daterange.data == 'week':
+            form.end.data = unlocalize_datetime((begin + timedelta(days=8)).replace(hour=0, minute=0, second=0)).strftime('%Y-%m-%dT%H:%M:%SZ')
+        elif form.predefined_daterange.data == 'month':
+            form.end.data = unlocalize_datetime((begin + timedelta(days=32)).replace(hour=0, minute=0, second=0)).strftime('%Y-%m-%dT%H:%M:%SZ')
+        else:
+            form.end.data = unlocalize_datetime((begin + timedelta(days=366)).replace(hour=0, minute=0, second=0)).strftime('%Y-%m-%dT%H:%M:%SZ')
     action = Action()
     form.populate_obj(action)
     action.set_cache(resource)
@@ -174,7 +187,18 @@ def action_extend_handler(data: dict, source: str):
 
     action = Action()
     form.populate_obj(action)
-    if not form.begin.data or not form.end.data:
+    if form.predefined_daterange.data:
+        begin = get_now().replace(microsecond=0)
+        form.begin.data = begin.strftime('%Y-%m-%dT%H:%M:%SZ')
+        if form.predefined_daterange.data == 'day':
+            form.end.data = (begin + timedelta(days=2)).replace(hour=0, minute=0, second=0).strftime('%Y-%m-%dT%H:%M:%SZ')
+        elif form.predefined_daterange.data == 'week':
+            form.end.data = (begin + timedelta(days=8)).replace(hour=0, minute=0, second=0).strftime('%Y-%m-%dT%H:%M:%SZ')
+        elif form.predefined_daterange.data == 'month':
+            form.end.data = (begin + timedelta(days=32)).replace(hour=0, minute=0, second=0).strftime('%Y-%m-%dT%H:%M:%SZ')
+        else:
+            form.end.data = (begin + timedelta(days=366)).replace(hour=0, minute=0, second=0).strftime('%Y-%m-%dT%H:%M:%SZ')
+    elif not form.begin.data or not form.end.data:
         action.begin = old_action.end
         action.end = action.begin + (old_action.end - old_action.begin)
     action.set_cache(old_action.resource)

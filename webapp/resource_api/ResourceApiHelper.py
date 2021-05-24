@@ -83,5 +83,6 @@ def get_location_reply(location: Location):
             'status', 'installed_at', 'unavailable_until'
         ], remove_none=True)
         item['pricegroup'] = resource.pricegroup.to_dict(ignore=['operator_id'], remove_none=True)
+        item['predefined_dateranges'] = [item for item in ['day', 'week', 'month', 'year'] if getattr(resource.pricegroup, 'fee_%s' % item) is not None]
         result['resource'].append(item)
     return jsonify_success(result)

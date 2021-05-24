@@ -40,7 +40,7 @@ class Pricegroup(db.Model, BaseModel):
     def get_timespan(cls, begin, end):
         if (end - begin).days > 35:
             return 'year'
-        if (end - begin).days > 8:
+        if (end - begin).days > 9:
             return 'month'
         if (end - begin).days > 2:
             return 'week'
