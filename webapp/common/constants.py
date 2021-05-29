@@ -76,3 +76,6 @@ class BaseConfig:
             'description': 'staging'
         }
     ]
+
+    GBFS_LAST_UPDATED = 1622200029
+    GBFS_TTL = 86400

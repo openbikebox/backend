@@ -30,8 +30,8 @@ from ..enum import ResourceStatus, AlertType
 @dataclass
 class GbfsResponse:
     data: dict
-    last_updated: int = field(default_factory=lambda: current_app.config['GBFS']['last_updated'])
-    ttl: Optional[int] = field(default_factory=lambda: current_app.config['GBFS']['ttl'])
+    last_updated: int = field(default_factory=lambda: current_app.config['GBFS_LAST_UPDATED'])
+    ttl: Optional[int] = field(default_factory=lambda: current_app.config['GBFS_TTL'])
     version: Optional[str] = '2.2'
 
 
@@ -181,7 +181,7 @@ def handle_gbfs_system_alerts(operator_id):
             alert_dict['end'] = alert.end.timestamp()
     return GbfsResponse(
         {'alerts': alert_dicts},
-        max([alert.modified.timestamp() for alert in alerts]) if len(alerts) else current_app.config['GBFS']['last_updated'],
+        max([alert.modified.timestamp() for alert in alerts]) if len(alerts) else current_app.config['GBFS_LAST_UPDATED'],
         60
     )
 
