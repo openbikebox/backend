@@ -18,9 +18,15 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from enum import Enum
 from ..extensions import db
 from .base import BaseModel
-from ..common.enum import ResourceGroupStatus
+
+
+class ResourceGroupStatus(Enum):
+    active = 'active'
+    inactive = 'inactive'
+    faulted = 'faulted'
 
 
 resource_group_image = db.Table(

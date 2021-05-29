@@ -30,6 +30,7 @@ class File(db.Model, BaseModel):
 
     operator = db.relationship('Operator', backref='logo', lazy='dynamic')
     location = db.relationship('Location', backref='photo', lazy='dynamic')
+    resource = db.relationship('Resource', backref='resource', lazy='dynamic')
 
     name = db.Column(db.String(255), info={'description': 'name'})
     mimetype = db.Column(db.String(255))

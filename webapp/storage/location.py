@@ -19,13 +19,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from lxml import etree
+from sqlalchemy import event, func
 from flask import current_app
 from ..extensions import db
-from .base import BaseModel
+from .base import BaseModel, Point
+
+
+location_file = db.Table(
+    'location_file',
+    db.Column('location_id', db.BigInteger, db.ForeignKey('location.id')),
+    db.Column('file_id', db.BigInteger, db.ForeignKey('file.id'))
+)
+
+location_alert = db.Table(
+    'location_alert',
+    db.Column('location_id', db.BigInteger, db.ForeignKey('location.id')),
+    db.Column('alert_id', db.BigInteger, db.ForeignKey('alert.id'))
+)
 
 
 class Location(db.Model, BaseModel):
     __tablename__ = 'location'
+
+    photos = db.relationship('File', secondary=location_file, backref=db.backref('locations', lazy='dynamic'))
+    alerts = db.relationship('Alert', secondary=location_alert, backref=db.backref('locations', lazy='dynamic'))
 
     operator_id = db.Column(db.BigInteger, db.ForeignKey('operator.id', use_alter=True), info={'description': 'operator id'})
     resource = db.relationship('Resource', backref='location', lazy='dynamic')
@@ -47,6 +64,9 @@ class Location(db.Model, BaseModel):
     description = db.Column(db.Text, info={'description': 'public description'})
 
     osm_id = db.Column(db.BigInteger, info={'description': 'openstreetmap id'})
+    twentyforseven = db.Column(db.Boolean)
+
+    geometry = db.Column(Point(), nullable=False)
 
     @property
     def booking_url(self) -> str:
@@ -77,3 +97,10 @@ class Location(db.Model, BaseModel):
         for resource in self.resource:
             root.append(resource.polygon_svg)
         return root
+
+
+@event.listens_for(Location, 'before_insert')
+@event.listens_for(Location, 'before_update')
+def set_geometry(mapper, connection, location):
+    location.geometry = func.GeomFromText('POINT(%s %s)' % (float(location.lat), float(location.lon)))
+

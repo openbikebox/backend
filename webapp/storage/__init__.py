@@ -30,3 +30,5 @@ from .resource_access import ResourceAccess
 from .resource import Resource
 from .file import File
 from .action import Action
+from .alert import Alert
+from .regular_hours import RegularHours

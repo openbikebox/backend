@@ -24,7 +24,7 @@ from flask import current_app
 from ..extensions import db
 from ..models import Action, Resource
 from ..common.response import error_response, success_response
-from ..common.enum import ActionStatus, ResourceStatus
+from ..enum import ActionStatus, ResourceStatus
 from ..common.helpers import get_now, get_current_time_local, unlocalize_datetime
 from ..common.exceptions import BikeBoxAccessDeniedException, BikeBoxNotExistingException
 from .ActionApiHelper import check_reservation_timeout

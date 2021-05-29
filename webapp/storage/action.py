@@ -18,12 +18,12 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from typing import Union
+from enum import Enum
 from uuid import uuid4
+from typing import Union
 from datetime import datetime, timedelta
 from ..extensions import db
 from .base import BaseModel
-from ..common.enum import ActionStatus
 from ..common.helpers import get_passcode, localize_datetime
 from ..common.exceptions import BikeBoxAccessDeniedException, BikeBoxNotExistingException
 from .resource_access import ResourceAccess
@@ -31,6 +31,14 @@ from .resource import Resource
 from .location import Location
 from .operator import Operator
 from .pricegroup import Pricegroup
+
+
+class ActionStatus(Enum):
+    reserved = 'reserved'
+    booked = 'booked'
+    timeouted = 'timeouted'
+    cancelled = 'cancelled'
+    disrupted = 'disrupted'
 
 
 class Action(db.Model, BaseModel):

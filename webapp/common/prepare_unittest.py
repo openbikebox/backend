@@ -28,9 +28,10 @@ from datetime import datetime
 from urllib.parse import urlparse
 
 from flask import current_app
-from ..models import User, Operator, Hardware, Location, File, Pricegroup, Resource, ResourceAccess, ResourceGroup
+from ..models import User, Operator, Hardware, Location, File, Pricegroup, Resource, ResourceAccess, ResourceGroup, \
+    RegularHours
 from ..extensions import db
-from ..common.enum import ResourceStatus, ResourceGroupStatus
+from ..enum import ResourceStatus, ResourceGroupStatus
 
 
 def prepare_unittest():
@@ -55,10 +56,10 @@ def prepare_unittest():
     connection.commit()
 
     user = User()
-    user.email = 'mail@ernestoruge.de'
+    user.email = 'test@binary-butterfly.de'
     user.password = 'unittest'
-    user.first_name = 'Ernesto'
-    user.last_name = 'Ruge'
+    user.first_name = 'Test'
+    user.last_name = 'User'
     user.company = 'binary butterfly GmbH'
     user.address = 'Am Hertinger Tor'
     user.postalcode = '59423'
@@ -79,15 +80,32 @@ def prepare_unittest():
     db.session.add(operator_logo)
     db.session.commit()
 
-    operator = Operator()
-    operator.name = 'Open Bike GmbH'
-    operator.address = 'Fahrradstraße 1'
-    operator.postalcode = '12345'
-    operator.locality = 'Fahrradstadt'
-    operator.country = 'de'
-    operator.tax_rate = Decimal('0.16')
-    operator.logo_id = operator_logo.id
-    db.session.add(operator)
+    operator_bike = Operator()
+    operator_bike.name = 'Open Bike GmbH'
+    operator_bike.address = 'Fahrradstraße 1'
+    operator_bike.postalcode = '12345'
+    operator_bike.locality = 'Fahrradstadt'
+    operator_bike.country = 'de'
+    operator_bike.tax_rate = Decimal('0.19')
+    operator_bike.logo_id = operator_logo.id
+    operator_bike.slug = 'open-bike-gmbh'
+    operator_bike.email = 'test@open-bike.gmbh'
+    operator_bike.url = 'https://openbikebox.de'
+    db.session.add(operator_bike)
+    db.session.commit()
+
+    operator_cargo = Operator()
+    operator_cargo.name = 'Open Cargo GmbH'
+    operator_cargo.address = 'Fahrradstraße 1'
+    operator_cargo.postalcode = '12345'
+    operator_cargo.locality = 'Fahrradstadt'
+    operator_cargo.country = 'de'
+    operator_cargo.tax_rate = Decimal('0.19')
+    operator_cargo.logo_id = operator_logo.id
+    operator_cargo.slug = 'open-cargo-gmbh'
+    operator_cargo.email = 'test@open-cargo.gmbh'
+    operator_cargo.url = 'https://opencargobike.de'
+    db.session.add(operator_cargo)
     db.session.commit()
 
     hardware_small = Hardware()
@@ -96,6 +114,10 @@ def prepare_unittest():
     hardware_big = Hardware()
     hardware_big.name = 'Sammel-Anlagen-Stellplatz'
     db.session.add(hardware_big)
+    hardware_cargo = Hardware()
+    hardware_cargo.name = 'Cargo-Bike'
+    db.session.add(hardware_cargo)
+    db.session.commit()
     db.session.commit()
 
     location_photo_small = File()
@@ -108,15 +130,16 @@ def prepare_unittest():
     db.session.commit()
 
     location_small = Location()
-    location_small.name = 'Fahrrad-Station Dortmund'
-    location_small.slug = 'fahrrad-station-dortmund'
+    location_small.name = 'Fahrrad-Station Teststadt 1'
+    location_small.slug = 'fahrrad-station-teststadt'
     location_small.address = 'Königswall 15'
     location_small.postalcode = '44137'
     location_small.locality = 'Dortmund'
     location_small.country = 'de'
+    location_small.twentyforseven = True
     location_small.lat = 51.517477
     location_small.lon = 7.460547
-    location_small.operator_id = operator.id
+    location_small.operator_id = operator_bike.id
     location_small.photo_id = location_photo_small.id
     db.session.add(location_small)
     db.session.commit()
@@ -131,18 +154,67 @@ def prepare_unittest():
     db.session.commit()
 
     location_big = Location()
-    location_big.name = 'Fahrrad-Station Bochum'
-    location_big.slug = 'fahrrad-station-bochum'
+    location_big.name = 'Fahrrad-Station Demostadt'
+    location_big.slug = 'fahrrad-station-demo'
     location_big.address = 'Kurt-Schumacher-Platz 1'
     location_big.postalcode = '44787'
     location_big.locality = 'Bochum'
     location_big.country = 'de'
+    location_big.twentyforseven = True
     location_big.lat = 51.479158
     location_big.lon = 7.222904
-    location_big.operator_id = operator.id
+    location_big.operator_id = operator_bike.id
     location_big.photo_id = location_photo_big.id
     db.session.add(location_big)
     db.session.commit()
+
+    location_cargo_file = File()
+    location_cargo_file.mimetype = 'image/jpeg'
+    copy2(
+        os.path.join(current_app.config['TESTS_DIR'], 'files', 'location-1.jpg'),
+        os.path.join(current_app.config['FILES_DIR'], '4.jpg')
+    )
+    db.session.add(location_cargo_file)
+    db.session.commit()
+
+    location_cargo = Location()
+    location_cargo.name = 'Cargo-Bike-Station'
+    location_cargo.slug = 'cargo-bike-station'
+    location_cargo.address = 'Bahnhofstraße 12'
+    location_cargo.postalcode = '71083'
+    location_cargo.locality = 'Herrenberg'
+    location_cargo.twentyforseven = False
+    location_cargo.country = 'de'
+    location_cargo.lat = 48.593811
+    location_cargo.lon = 8.863288
+    location_cargo.operator_id = operator_cargo.id
+    location_cargo.photo_id = location_cargo_file.id
+    db.session.add(location_cargo)
+    db.session.commit()
+
+    regular_hours = RegularHours()
+    regular_hours.weekday = 2
+    regular_hours.period_begin = 36000
+    regular_hours.period_end = 68400
+    db.session.add(regular_hours)
+
+    regular_hours = RegularHours()
+    regular_hours.weekday = 3
+    regular_hours.period_begin = 54000
+    regular_hours.period_end = 68400
+    db.session.add(regular_hours)
+
+    regular_hours = RegularHours()
+    regular_hours.weekday = 4
+    regular_hours.period_begin = 54000
+    regular_hours.period_end = 68400
+    db.session.add(regular_hours)
+
+    regular_hours = RegularHours()
+    regular_hours.weekday = 5
+    regular_hours.period_begin = 36000
+    regular_hours.period_end = 68400
+    db.session.add(regular_hours)
 
     pricegroup = Pricegroup()
     pricegroup.fee_hour = '0.20'
@@ -164,10 +236,10 @@ def prepare_unittest():
     db.session.add(resource_access_big)
 
     resource_group_small = ResourceGroup()
-    resource_group_small.name = 'Fahrrad-Station Dortmund'
-    resource_group_small.slug = 'fahrrad-station-dortmund'
-    resource_group_small.internal_identifier = 'dortmund-1'
-    resource_group_small.user_identifier = 'dortmund-1'
+    resource_group_small.name = 'Fahrrad-Station Teststadt'
+    resource_group_small.slug = 'fahrrad-station-teststadt'
+    resource_group_small.internal_identifier = 'teststadt-1'
+    resource_group_small.user_identifier = 'teststadt-1'
     resource_group_small.max_bookingdate = 365
     resource_group_small.installed_at = datetime.utcnow()
     resource_group_small.status = ResourceGroupStatus.active
@@ -175,10 +247,10 @@ def prepare_unittest():
     db.session.commit()
 
     resource_group_big = ResourceGroup()
-    resource_group_big.name = 'Fahrrad-Station Bochum'
-    resource_group_big.slug = 'fahrrad-station-bochum'
-    resource_group_big.internal_identifier = 'bochum-1'
-    resource_group_big.user_identifier = 'bochum-1'
+    resource_group_big.name = 'Fahrrad-Station Demostadt'
+    resource_group_big.slug = 'fahrrad-station-demostadt'
+    resource_group_big.internal_identifier = 'demostadt-1'
+    resource_group_big.user_identifier = 'demostadt-1'
     resource_group_big.max_bookingdate = 365
     resource_group_big.installed_at = datetime.utcnow()
     resource_group_big.status = ResourceGroupStatus.active
@@ -229,6 +301,28 @@ def prepare_unittest():
             db.session.commit()
             counter += 1
 
+    resource_cargo_file = File()
+    resource_cargo_file.mimetype = 'image/jpeg'
+    copy2(
+        os.path.join(current_app.config['TESTS_DIR'], 'files', 'location-1.jpg'),
+        os.path.join(current_app.config['FILES_DIR'], '4.jpg')
+    )
+    db.session.add(resource_cargo_file)
+    db.session.commit()
+
+    resource_cargo = Resource()
+    resource_cargo.hardware_id = hardware_cargo.id
+    resource_cargo.pricegroup_id = pricegroup.id
+    resource_cargo.slug = str(uuid4())
+    resource_cargo.location_id = location_cargo.id
+    resource_cargo.status = ResourceStatus.free
+    resource_cargo.installed_at = datetime.utcnow()
+    resource_cargo.user_identifier = 'cargobike-1'
+    resource_cargo.internal_identifier = 'cargobike-1'
+    resource_cargo.photo_id = resource_cargo_file.id
+    db.session.add(resource_cargo)
+    db.session.commit()
+
 
 truncate_dbs = '''
 SET FOREIGN_KEY_CHECKS=0;
@@ -243,5 +337,7 @@ TRUNCATE `resource`;
 TRUNCATE `resource_access`;
 TRUNCATE `resource_group`;
 TRUNCATE `user`;
+TRUNCATE `regular_hours`;
+TRUNCATE `alert`;
 SET FOREIGN_KEY_CHECKS=1;
 '''

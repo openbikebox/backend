@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from datetime import datetime
 from ..models import Resource
-from ..common.enum import ResourceStatus
+from ..enum import ResourceStatus
 from ..extensions import db
 
 

@@ -21,15 +21,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 import traceback
 from hashlib import sha256
-from flask import Flask, request, render_template, session, jsonify
+from flask import Flask, request, jsonify
 
 from .config import Config
 from .common.constants import BaseConfig
 from .common.filter import register_global_filters
 from .extensions import db, mail, celery, redis, cors, auth
-from .models import User
 
 # Blueprints
+from .gbfs import gbfs_controller
+from .tiles import tiles_controller
 from .frontend import frontend
 from .action_api import action_api
 from .resource_api import resource_api
@@ -41,7 +42,9 @@ BLUEPRINTS = [
     frontend,
     action_api,
     resource_api,
-    api_documentation_blueprint
+    api_documentation_blueprint,
+    gbfs_controller,
+    tiles_controller
 ]
 
 
@@ -128,23 +131,18 @@ def configure_error_handlers(app):
     def error_403(error):
         from .common.reputation import reputation_add
         reputation_add(5)
-        if request.path.startswith('/api'):
-            return jsonify({'status': -1, 'code': 403})
-        return render_template('403.html'), 403
+        return jsonify({'status': -1, 'code': 403})
 
     @app.errorhandler(404)
     def error_404(error):
         from .common.reputation import reputation_add
         reputation_add(5)
-        if request.path.startswith('/api'):
-            return jsonify({'status': -1, 'code': 404})
-        return render_template('404.html'), 404
+        return jsonify({'status': -1, 'code': 404})
 
     @app.errorhandler(429)
     def error_429(error):
         if request.path.startswith('/api'):
             return jsonify({'status': -1, 'code': 429})
-        return render_template('429.html'), 429
 
     @app.errorhandler(500)
     def error_500(error):
@@ -152,9 +150,7 @@ def configure_error_handlers(app):
         logger.critical('app', str(error), traceback.format_exc())
         from .common.reputation import reputation_add
         reputation_add(10)
-        if request.path.startswith('/api'):
-            return jsonify({'status': -1, 'code': 500})
-        return render_template('500.html'), 500
+        return jsonify({'status': -1, 'code': 500})
 
     if not app.config['DEBUG']:
         @app.errorhandler(Exception)
@@ -163,6 +159,4 @@ def configure_error_handlers(app):
             logger.critical('app', str(error), traceback.format_exc())
             from .common.reputation import reputation_add
             reputation_add(10)
-            if request.path.startswith('/api'):
-                return jsonify({'status': -1, 'code': 500})
-            return render_template('500.html'), 500
+            return jsonify({'status': -1, 'code': 500})

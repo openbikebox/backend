@@ -82,3 +82,8 @@ def log_request(log_file: str = 'requests'):
     return decorator
 
 
+def protobuf_response(data: bytes):
+    response = make_response(data)
+    response.headers['Content-Type'] = 'application/x-protobuf'
+    response.headers['Access-Control-Allow-Origin'] = "*"
+    return response

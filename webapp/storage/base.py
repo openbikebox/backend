@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import json
 from typing import Optional, List
+from sqlalchemy.types import UserDefinedType
 from sqlalchemy.sql.sqltypes import DateTime, Numeric, Enum, String, Boolean, Integer, Text, Date, SmallInteger
 from flask import current_app
 from ..extensions import db
@@ -113,8 +114,6 @@ class BaseModel:
                     'format': 'date-time'
                 }
             if field in result:
-                #if cls.metadata.tables.get(cls.__tablename__).c[field].default:
-                #    result[field]['default'] = cls.metadata.tables.get(cls.__tablename__).c[field].default
                 result[field]['description'] = cls.metadata.tables.get(cls.__tablename__).c[field].info.get('description', '')
         return {
             '$schema': 'http://json-schema.org/draft-07/schema#',
@@ -123,3 +122,8 @@ class BaseModel:
             'description': cls._description,
             'properties': result
         }
+
+
+class Point(UserDefinedType):
+    def get_col_spec(self):
+        return 'POINT'

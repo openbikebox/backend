@@ -18,22 +18,46 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from enum import Enum
 from lxml import etree
-from typing import Optional, List
 from ..extensions import db
 from .base import BaseModel
-from ..common.enum import ResourceStatus
+
+
+class ResourceStatus(Enum):
+    free = 'free'
+    taken = 'taken'
+    reserved = 'reserved'
+    inactive = 'inactive'
+    faulted = 'faulted'
+
+
+resource_file = db.Table(
+    'resource_file',
+    db.Column('resource_id', db.BigInteger, db.ForeignKey('resource.id')),
+    db.Column('file_id', db.BigInteger, db.ForeignKey('file.id'))
+)
+
+resource_alert = db.Table(
+    'resource_alert',
+    db.Column('resource_id', db.BigInteger, db.ForeignKey('resource.id')),
+    db.Column('alert_id', db.BigInteger, db.ForeignKey('alert.id'))
+)
 
 
 class Resource(db.Model, BaseModel):
     __tablename__ = 'resource'
     _description = 'Eine buchbare Ressource'
 
+    photos = db.relationship('File', secondary=resource_file, backref=db.backref('resources', lazy='dynamic'))
+    alerts = db.relationship('Alert', secondary=resource_alert, backref=db.backref('resources', lazy='dynamic'))
+
     location_id = db.Column(db.BigInteger, db.ForeignKey('location.id', use_alter=True), info={'description': 'location id'})
     pricegroup_id = db.Column(db.BigInteger, db.ForeignKey('pricegroup.id', use_alter=True), info={'description': 'pricegroup id'})
     hardware_id = db.Column(db.BigInteger, db.ForeignKey('hardware.id', use_alter=True), info={'description': 'hardware id'})
     resource_group_id = db.Column(db.BigInteger, db.ForeignKey('resource_group.id', use_alter=True), info={'description': 'resource group id'})
     resource_access_id = db.Column(db.BigInteger, db.ForeignKey('resource_access.id', use_alter=True), info={'description': 'resource access id'})
+    photo_id = db.Column(db.BigInteger, db.ForeignKey('file.id', use_alter=True), info={'description': 'file id'})
 
     name = db.Column(db.String(255), info={'description': 'public name'})
     slug = db.Column(db.String(255), index=True, unique=True, info={'description': 'slug'})

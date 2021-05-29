@@ -23,7 +23,7 @@ from uuid import uuid4
 from datetime import datetime
 from ..models import Resource, Location, Pricegroup, Hardware, ResourceGroup, ResourceAccess
 from ..extensions import db
-from ..common.enum import ResourceStatus
+from ..enum import ResourceStatus
 
 
 def fill_location(

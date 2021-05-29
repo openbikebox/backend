@@ -32,9 +32,11 @@ class Operator(db.Model, BaseModel):
     tax_rate = db.Column(db.Numeric(precision=5, scale=4), nullable=False, info={'description': ''})
 
     name = db.Column(db.String(255), info={'description': 'public name'})
+    slug = db.Column(db.String(255), index=True, unique=True, info={'description': 'slug'})
     description = db.Column(db.Text, info={'description': 'public description'})
     address = db.Column(db.String(255), info={'description': 'public address'})
     postalcode = db.Column(db.String(255), info={'description': 'public postalcode'})
     locality = db.Column(db.String(255), info={'description': 'public locality'})
     country = db.Column(db.String(2), info={'description': 'public country'})
-
+    url = db.Column(db.String(255))
+    email = db.Column(db.String(255))

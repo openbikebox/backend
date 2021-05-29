@@ -80,9 +80,6 @@ prepare-unittest:
 # -------
 clean: docker-down
 	rm -f webapp/config.py
-	rm -f package-lock.json
-	# This is incomplete:
-	rm -rf node_modules/ venv/ static/js/ static/webpack-assets.json
 
 
 # Test suites

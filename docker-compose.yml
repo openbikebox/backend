@@ -26,14 +26,6 @@ services:
     user: ${CURRENT_UID}
     command: ["/app/celery_dev.sh"]
 
-  webpack:
-    image: node:12
-    ports:
-    - 8889:8888
-    volumes:
-      - .:/app
-    command: ["/app/webpack_dev.sh"]
-
   mysql:
     image: mariadb
     container_name: open-bike-box-backend-mysql

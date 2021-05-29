@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from ..extensions import celery, db
 from ..models import Resource, Action
-from ..common.enum import ResourceStatus, ActionStatus
+from ..enum import ResourceStatus, ActionStatus
 
 
 @celery.task
