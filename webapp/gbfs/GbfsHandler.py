@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from sqlalchemy import or_
 from typing import Optional
+from itertools import groupby
 from dataclasses import dataclass, field
 from flask import current_app
 from ..models import Operator, Location, Resource, Alert
@@ -117,11 +118,11 @@ def handle_gbfs_station_information(operator_id: int):
                 "web": "%s/location/%s" % (operator.url, location.slug)
             }
         })
-    return GbfsResponse({
-        'stations': location_dicts
-    }, max([location.modified for location in locations]).timestamp(), )
+    return GbfsResponse(
+        {'stations': location_dicts},
+        max([location.modified for location in locations]).timestamp()
+    )
 
-from itertools import groupby
 
 def handle_gbfs_station_status(operator_id):
     Operator.query.get_or_404(operator_id)
@@ -136,23 +137,25 @@ def handle_gbfs_station_status(operator_id):
         ).join(Location, Resource.location_id == Location.id)\
         .filter(Location.operator_id == operator_id)\
         .all()
-    for location_slug, resources in groupby(resources, key=lambda item:item.location_slug):
-        resources = list(resources)
+    for location_slug, location_resources in groupby(resources, key=lambda item:item.location_slug):
+        location_resources = list(location_resources)
         locations.append({
             "station_id": location_slug,
-            'num_bikes_available': sum([1 for resource in resources if resource.status == ResourceStatus.free]),
+            'num_bikes_available': sum([1 for resource in location_resources if resource.status == ResourceStatus.free]),
             'vehicle_types_available': [{
                 'vehicle_type_id': 'cargobike_electric_assist',
-                'count': sum([1 for resource in resources if resource.status == ResourceStatus.free]),
+                'count': sum([1 for resource in location_resources if resource.status == ResourceStatus.free]),
             }],
             'is_installed': True,
             'is_renting': True,
             'is_returning': True,
-            'last_reported': max([resource.resource_modified for resource in resources]).timestamp()
+            'last_reported': max([resource.resource_modified for resource in location_resources]).timestamp()
         })
-    return GbfsResponse({
-        'stations': locations
-    })
+    return GbfsResponse(
+        {'stations': locations},
+        max([resource.modified for resource in resources]).timestamp(),
+        60
+    )
 
 
 def handle_gbfs_system_alerts(operator_id):
@@ -187,7 +190,10 @@ def handle_gbfs_system_alerts(operator_id):
 
 def handle_gbfs_system_hours(operator_id):
     operator = Operator.query.get_or_404(operator_id)
-    return GbfsResponse({'rental_hours': []}, operator.modified.timestamp())
+    return GbfsResponse(
+        {'rental_hours': []},
+        operator.modified.timestamp()
+    )
 
 
 def handle_gbfs_vehicle_types(operator_id):
