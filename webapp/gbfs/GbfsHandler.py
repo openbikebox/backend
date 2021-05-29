@@ -153,14 +153,16 @@ def handle_gbfs_station_status(operator_id):
         })
     return GbfsResponse(
         {'stations': locations},
-        max([resource.modified for resource in resources]).timestamp(),
+        max([max([resource.resource_modified, resource.location_modified]) for resource in resources]).timestamp(),
         60
     )
 
 
 def handle_gbfs_system_alerts(operator_id):
     operator = Operator.query.get_or_404(operator_id)
-    alerts = Alert.query.filter(or_(Alert.operator_id == operator.id, Alert.locations.any(Location.operator_id == operator_id))).all()
+    alerts = Alert.query\
+        .filter(or_(Alert.operator_id == operator.id, Alert.locations.any(Location.operator_id == operator_id)))\
+        .all()
     alert_dicts = []
     for alert in alerts:
         if not alert.active:
