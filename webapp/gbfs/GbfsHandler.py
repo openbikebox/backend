@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from sqlalchemy import or_
 from typing import Optional
-from datetime import datetime
 from dataclasses import dataclass, field
 from flask import current_app
 from ..models import Operator, Location, Resource, Alert
@@ -141,10 +140,10 @@ def handle_gbfs_station_status(operator_id):
         resources = list(resources)
         locations.append({
             "station_id": location_slug,
-            'num_bikes_available': sum([1 for resource in resources if resource.status == 'free']),
+            'num_bikes_available': sum([1 for resource in resources if resource.status == ResourceStatus.free]),
             'vehicle_types_available': [{
                 'vehicle_type_id': 'cargobike_electric_assist',
-                'count': sum([1 for resource in resources if resource.status == 'free']),
+                'count': sum([1 for resource in resources if resource.status == ResourceStatus.free]),
             }],
             'is_installed': True,
             'is_renting': True,
