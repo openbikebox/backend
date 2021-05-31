@@ -35,6 +35,7 @@ from .frontend import frontend
 from .action_api import action_api
 from .resource_api import resource_api
 from .api_documentation.Controller import api_documentation_blueprint
+from .common.reputation import reputation_cli
 
 __all__ = ['launch']
 
@@ -44,7 +45,8 @@ BLUEPRINTS = [
     resource_api,
     api_documentation_blueprint,
     gbfs_controller,
-    tiles_controller
+    tiles_controller,
+    reputation_cli
 ]
 
 

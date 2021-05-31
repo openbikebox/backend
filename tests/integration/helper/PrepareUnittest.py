@@ -28,10 +28,10 @@ from datetime import datetime
 from urllib.parse import urlparse
 
 from flask import current_app
-from ..models import User, Operator, Hardware, Location, File, Pricegroup, Resource, ResourceAccess, ResourceGroup, \
+from webapp.models import User, Operator, Hardware, Location, File, Pricegroup, Resource, ResourceAccess, ResourceGroup, \
     RegularHours
-from ..extensions import db
-from ..enum import ResourceStatus, ResourceGroupStatus
+from webapp.extensions import db
+from webapp.enum import ResourceStatus, ResourceGroupStatus
 
 
 def prepare_unittest():
@@ -341,3 +341,5 @@ TRUNCATE `regular_hours`;
 TRUNCATE `alert`;
 SET FOREIGN_KEY_CHECKS=1;
 '''
+
+prepare_unittest()

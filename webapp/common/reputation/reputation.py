@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from hashlib import md5
 from flask import request, current_app, abort
-from ..extensions import redis, logger
+from ...extensions import redis, logger
 
 
 def reputation_add(count: int) -> None:
@@ -64,3 +64,4 @@ def get_reputation_list() -> dict:
     for key, value in redis.hscan_iter('reputation'):
         result[key.decode()] = int(value)
     return result
+

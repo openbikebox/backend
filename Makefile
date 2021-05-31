@@ -60,7 +60,7 @@ docker-logs:
 
 # Run arbitrary commands in the flask container
 flask-run:
-	@test -n "$(CMD)" || ( echo 'Usage: make flask-run CMD="python manage.py help"' && exit 1 )
+	@test -n "$(CMD)" || ( echo 'Usage: make flask-run CMD="flask run --help"' && exit 1 )
 	$(FLASK_RUN) $(CMD)
 
 
@@ -69,11 +69,11 @@ flask-run:
 
 # Updates the database to the current version
 migrate: config
-	$(FLASK_RUN) python manage.py db upgrade
+	$(FLASK_RUN) flask db upgrade
 
 # Create some test data including user accounts
 prepare-unittest:
-	$(FLASK_RUN) python manage.py prepare_unittest
+	$(FLASK_RUN) python -m tests.integration.helper.PrepareUnittest
 
 
 # Cleanup

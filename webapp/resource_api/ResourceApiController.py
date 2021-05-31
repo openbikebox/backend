@@ -27,7 +27,9 @@ from ..extensions import api_documentation
 from .ResourceApiHelper import locations_geojson, get_location_reply, locations_list
 from ..api_documentation.ApiDocumentation import EndpointTag
 
-resource_api = Blueprint('resource_api', __name__, template_folder='templates')
+resource_api = Blueprint('resource', __name__)
+
+from . import ResourceApiCli
 
 
 @resource_api.route('/api/v1/locations')

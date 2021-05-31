@@ -18,30 +18,18 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from flask_sqlalchemy import SQLAlchemy
-db = SQLAlchemy()
+from datetime import datetime
+from ...models import Resource
+from ...enum import ResourceStatus
+from ...extensions import db
 
-from flask_migrate import Migrate
-migrate = Migrate()
 
-from flask_mail import Mail
-mail = Mail()
-
-from .common.celery import LogErrorsCelery
-celery = LogErrorsCelery()
-
-from flask_cors import CORS
-cors = CORS()
-
-from flask_redis import FlaskRedis
-redis = FlaskRedis()
-
-from flask_httpauth import HTTPBasicAuth
-auth = HTTPBasicAuth()
-
-from .common.logger import Logger
-logger = Logger()
-
-from .api_documentation.ApiDocumentation import ApiDocumentation
-api_documentation = ApiDocumentation()
-
+def free_resource_worker():
+    resources = Resource.query\
+        .filter(Resource.status.in_([ResourceStatus.taken, ResourceStatus.reserved]))\
+        .filter(Resource.unavailable_until < datetime.utcnow())\
+        .all()
+    for resource in resources:
+        resource.status = ResourceStatus.free
+        db.session.add(resource)
+    db.session.commit()

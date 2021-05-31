@@ -18,30 +18,4 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from flask_sqlalchemy import SQLAlchemy
-db = SQLAlchemy()
-
-from flask_migrate import Migrate
-migrate = Migrate()
-
-from flask_mail import Mail
-mail = Mail()
-
-from .common.celery import LogErrorsCelery
-celery = LogErrorsCelery()
-
-from flask_cors import CORS
-cors = CORS()
-
-from flask_redis import FlaskRedis
-redis = FlaskRedis()
-
-from flask_httpauth import HTTPBasicAuth
-auth = HTTPBasicAuth()
-
-from .common.logger import Logger
-logger = Logger()
-
-from .api_documentation.ApiDocumentation import ApiDocumentation
-api_documentation = ApiDocumentation()
-
+from .cli import reputation_cli

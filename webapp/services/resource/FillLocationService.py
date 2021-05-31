@@ -21,9 +21,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from math import ceil
 from uuid import uuid4
 from datetime import datetime
-from ..models import Resource, Location, Pricegroup, Hardware, ResourceGroup, ResourceAccess
-from ..extensions import db
-from ..enum import ResourceStatus
+from ...models import Resource, Location, Pricegroup, Hardware, ResourceGroup, ResourceAccess
+from ...extensions import db
+from ...enum import ResourceStatus
 
 
 def fill_location(

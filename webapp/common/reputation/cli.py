@@ -18,18 +18,12 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from datetime import datetime
-from ..models import Resource
-from ..enum import ResourceStatus
-from ..extensions import db
+from flask import Blueprint
+from .reputation import reputation_heartbeat
+
+reputation_cli = Blueprint('reputation', __name__)
 
 
-def free_resource_worker():
-    resources = Resource.query\
-        .filter(Resource.status.in_([ResourceStatus.taken, ResourceStatus.reserved]))\
-        .filter(Resource.unavailable_until < datetime.utcnow())\
-        .all()
-    for resource in resources:
-        resource.status = ResourceStatus.free
-        db.session.add(resource)
-    db.session.commit()
+@reputation_cli.cli.command("heartbeat", help='heartbeat should run every 600 seconds')
+def cli_reputation_heartbeat():
+    reputation_heartbeat()
