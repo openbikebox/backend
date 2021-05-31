@@ -24,7 +24,7 @@ from flask_cors import cross_origin
 from ..common.response import jsonify_success, log_request
 from ..models import Location
 from ..extensions import api_documentation
-from .ResourceApiHelper import locations_geojson, get_location_reply, locations_list
+from .ResourceApiHandler import locations_geojson, get_location_reply, locations_list
 from ..api_documentation.ApiDocumentation import EndpointTag
 
 resource_api = Blueprint('resource', __name__)

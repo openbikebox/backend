@@ -64,6 +64,7 @@ def get_location_reply(location: Location):
         return svg_response(location.polygon_svg)
     if request.args.get('format') == 'geojson':
         return jsonify(location.polygon_geojson)
+
     result = location.to_dict(remove_none=True, ignore=['geometry'])
     result['booking_url'] = location.booking_url
     result['photo'] = location.photo.to_dict(
@@ -80,9 +81,14 @@ def get_location_reply(location: Location):
     for resource in location.resource:
         item = resource.to_dict(fields=[
             'id', 'id_url', 'created', 'modified', 'slug', 'user_identifier', 'maintenance_from', 'maintenance_till',
-            'status', 'installed_at', 'unavailable_until'
+            'status', 'installed_at', 'unavailable_until', 'description'
         ], remove_none=True)
         item['pricegroup'] = resource.pricegroup.to_dict(ignore=['operator_id'], remove_none=True)
+        if resource.photo_id:
+            item['photo'] = resource.photo.to_dict(
+                fields=['id', 'id_url', 'created', 'modified', 'url', 'mimetype'],
+                remove_none=True
+            )
         item['predefined_dateranges'] = [item for item in ['day', 'week', 'month', 'year'] if getattr(resource.pricegroup, 'fee_%s' % item) is not None]
         result['resource'].append(item)
     return jsonify_success(result)
