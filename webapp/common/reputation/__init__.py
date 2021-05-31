@@ -19,3 +19,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from .cli import reputation_cli
+from .reputation import reputation_add
