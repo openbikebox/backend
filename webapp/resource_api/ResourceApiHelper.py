@@ -64,7 +64,7 @@ def get_location_reply(location: Location):
         return svg_response(location.polygon_svg)
     if request.args.get('format') == 'geojson':
         return jsonify(location.polygon_geojson)
-    result = location.to_dict(remove_none=True)
+    result = location.to_dict(remove_none=True, ignore=['geometry'])
     result['booking_url'] = location.booking_url
     result['photo'] = location.photo.to_dict(
         fields=['id', 'id_url', 'created', 'modified', 'url', 'mimetype'],
