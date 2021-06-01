@@ -18,6 +18,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from hashlib import sha256
 from .common.constants import BaseConfig
 
 
@@ -42,3 +43,10 @@ class Config(BaseConfig):
     CELERY_BROKER_URL = 'amqp://rabbitmq'
     SOCKETIO_QUEUE = 'amqp://rabbitmq'
     REDIS_URL = 'redis://redis'
+
+    BASICAUTH = {
+        'integration-test': {
+            'password': sha256(b'integration-test').hexdigest(),
+            'capabilities': [1]
+        }
+    }
