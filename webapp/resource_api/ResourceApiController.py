@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 from flask import Blueprint, jsonify, abort, request
 from flask_cors import cross_origin
-from ..common.response import json_response, svg_response
+from ..common.response import svg_response
 from ..models import Location
 from ..extensions import api_documentation
 from ..enum import LocationType
@@ -81,8 +81,8 @@ def api_locations_geojson():
         locations = locations.filter_by(type=getattr(LocationType, request.args.get('type')))
     locations = locations.all()
     if request.args.get('format') == 'geojson':
-        return json_response(locations_geojson(locations), cors=True)
-    return json_response(locations_list(locations), cors=True)
+        return jsonify(locations_geojson(locations))
+    return jsonify(locations_list(locations))
 
 
 @resource_api.route('/api/v1/location/<int:location_id>')
@@ -115,10 +115,10 @@ def api_locations_geojson():
 def api_location(location_id):
     location = Location.query.get_or_404(location_id)
     if request.args.get('format') == 'svg':
-        return svg_response(location.polygon_svg, cors=True)
+        return svg_response(location.polygon_svg)
     if request.args.get('format') == 'geojson':
-        return json_response(location.polygon_geojson)
-    return json_response(get_location_reply(location), cors=True)
+        return jsonify(location.polygon_geojson)
+    return jsonify(get_location_reply(location))
 
 
 @resource_api.route('/api/v1/location')
@@ -157,8 +157,8 @@ def api_location_param():
     if not location:
         abort(404)
     if request.args.get('format') == 'svg':
-        return svg_response(location.polygon_svg, cors=True)
-    return json_response(get_location_reply(location), cors=True)
+        return svg_response(location.polygon_svg)
+    return jsonify(get_location_reply(location))
 
 
 @resource_api.route('/api/v1/location/<int:location_id>/actions')
@@ -190,10 +190,7 @@ def api_location_param():
 )
 @cross_origin()
 def api_location_actions(location_id: int):
-    return json_response(
-        get_location_action_reply(location_id, request.args.get('begin'), request.args.get('end')),
-        cors=True
-    )
+    return jsonify(get_location_action_reply(location_id, request.args.get('begin'), request.args.get('end')))
 
 
 @resource_api.route('/api/v1/resource/<int:resource_id>/actions')
@@ -225,8 +222,5 @@ def api_location_actions(location_id: int):
 )
 @cross_origin()
 def api_resource_actions(resource_id: int):
-    return json_response(
-        get_resource_action_reply(resource_id, request.args.get('begin'), request.args.get('end')),
-        cors=True
-    )
+    return jsonify(get_resource_action_reply(resource_id, request.args.get('begin'), request.args.get('end')))
 
