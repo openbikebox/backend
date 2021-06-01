@@ -40,3 +40,4 @@ class Operator(db.Model, BaseModel):
     country = db.Column(db.String(2), info={'description': 'public country'})
     url = db.Column(db.String(255))
     email = db.Column(db.String(255))
+    future_booking = db.Column(db.String(255))

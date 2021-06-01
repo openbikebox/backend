@@ -82,6 +82,10 @@ class Resource(db.Model, BaseModel):
         return result
 
     @property
+    def future_booking(self):
+        return self.location.operator.future_booking and self.hardware.future_booking
+
+    @property
     def polygon_geojson(self) -> dict:
         return {
             'type': 'Feature',

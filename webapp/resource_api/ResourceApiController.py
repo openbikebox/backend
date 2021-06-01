@@ -21,10 +21,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 from flask import Blueprint, jsonify, abort, request
 from flask_cors import cross_origin
-from ..common.response import jsonify_success
+from ..common.response import json_response, svg_response
 from ..models import Location
 from ..extensions import api_documentation
-from .ResourceApiHandler import locations_geojson, get_location_reply, locations_list, get_resource_action_reply
+from ..enum import LocationType
+from .ResourceApiHandler import locations_geojson, get_location_reply, locations_list, get_resource_action_reply, \
+    get_location_action_reply
 from ..api_documentation.ApiDocumentation import EndpointTag
 
 resource_api = Blueprint('resource', __name__)
@@ -36,16 +38,35 @@ from . import ResourceApiCli
 @api_documentation.register(
     summary='getting aggregated information about locations',
     tags=[EndpointTag.information],
-    args=[{
-        'name': 'format',
-        'description': 'whether output should geojson or json list',
-        'schema': {
-            'type': 'string',
-            'enum': ['list', 'geojson'],
-            'default': 'list'
+    args=[
+        {
+            'name': 'format',
+            'description': 'whether output should geojson or json list',
+            'schema': {
+                'type': 'string',
+                'enum': ['list', 'geojson'],
+                'default': 'list'
+            },
+            'required': False
         },
-        'required': False
-    }],
+        {
+            'name': 'operator.id',
+            'description': 'operator id',
+            'schema': {
+                'type': 'integer'
+            },
+            'required': False
+        },
+        {
+            'name': 'type',
+            'description': 'location type',
+            'schema': {
+                'type': 'string',
+                'enum': ['bikebox', 'cargobike']
+            },
+            'required': False
+        },
+    ],
     response_schema_multi={
         'application/json': os.path.join(os.path.dirname(os.path.realpath(__file__)), 'schema', 'locations-response-list.json'),
         'application/geo+json': os.path.join(os.path.dirname(os.path.realpath(__file__)), 'schema', 'locations-response-geojson.json')
@@ -56,10 +77,12 @@ def api_locations_geojson():
     locations = Location.query
     if request.args.get('operator.id', type=int, default=0):
         locations = locations.filter_by(operator_id=request.args.get('operator.id', type=int))
+    if request.args.get('type') in ['bikebox', 'cargobike']:
+        locations = locations.filter_by(type=getattr(LocationType, request.args.get('type')))
     locations = locations.all()
     if request.args.get('format') == 'geojson':
-        return jsonify(locations_geojson(locations))
-    return jsonify_success(locations_list(locations))
+        return json_response(locations_geojson(locations), cors=True)
+    return json_response(locations_list(locations), cors=True)
 
 
 @resource_api.route('/api/v1/location/<int:location_id>')
@@ -91,7 +114,11 @@ def api_locations_geojson():
 @cross_origin()
 def api_location(location_id):
     location = Location.query.get_or_404(location_id)
-    return get_location_reply(location)
+    if request.args.get('format') == 'svg':
+        return svg_response(location.polygon_svg, cors=True)
+    if request.args.get('format') == 'geojson':
+        return json_response(location.polygon_geojson)
+    return json_response(get_location_reply(location), cors=True)
 
 
 @resource_api.route('/api/v1/location')
@@ -129,10 +156,12 @@ def api_location_param():
     location = Location.query.filter_by(slug=request.args.get('slug')).first()
     if not location:
         abort(404)
-    return get_location_reply(location)
+    if request.args.get('format') == 'svg':
+        return svg_response(location.polygon_svg, cors=True)
+    return json_response(get_location_reply(location), cors=True)
 
 
-@resource_api.route('/api/v1/resource/<int:resource_id>/actions')
+@resource_api.route('/api/v1/location/<int:location_id>/actions')
 @api_documentation.register(
     summary='getting actions of location',
     tags=[EndpointTag.information],
@@ -160,6 +189,44 @@ def api_location_param():
     response_schema=os.path.join(os.path.dirname(os.path.realpath(__file__)), 'schema', 'location-action-response.json')
 )
 @cross_origin()
+def api_location_actions(location_id: int):
+    return json_response(
+        get_location_action_reply(location_id, request.args.get('begin'), request.args.get('end')),
+        cors=True
+    )
+
+
+@resource_api.route('/api/v1/resource/<int:resource_id>/actions')
+@api_documentation.register(
+    summary='getting actions of resource',
+    tags=[EndpointTag.information],
+    args=[
+        {
+            'name': 'begin',
+            'description': 'begin of daterange',
+            'schema': {
+                'type': 'string',
+                'format': 'date'
+            },
+            'required': True
+        },
+        {
+            'name': 'end',
+            'description': 'end of daterange',
+            'schema': {
+                'type': 'string',
+                'format': 'date'
+            },
+            'required': True
+
+        },
+    ],
+    response_schema=os.path.join(os.path.dirname(os.path.realpath(__file__)), 'schema', 'resource-action-response.json')
+)
+@cross_origin()
 def api_resource_actions(resource_id: int):
-    return get_resource_action_reply(resource_id)
+    return json_response(
+        get_resource_action_reply(resource_id, request.args.get('begin'), request.args.get('end')),
+        cors=True
+    )
 

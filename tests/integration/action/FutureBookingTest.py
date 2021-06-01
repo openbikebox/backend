@@ -17,9 +17,3 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-
-from .storage.resource_group import ResourceGroupStatus
-from .storage.action import ActionStatus
-from .storage.resource import ResourceStatus
-from .storage.alert import AlertType
-from .storage.location import LocationType

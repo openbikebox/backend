@@ -47,6 +47,6 @@ class Config(BaseConfig):
     BASICAUTH = {
         'integration-test': {
             'password': sha256(b'integration-test').hexdigest(),
-            'capabilities': [1]
+            'capabilities': [1, 2]
         }
     }

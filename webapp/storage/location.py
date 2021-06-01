@@ -18,6 +18,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from enum import Enum
 from lxml import etree
 from sqlalchemy import event, func
 from flask import current_app
@@ -38,6 +39,11 @@ location_alert = db.Table(
 )
 
 
+class LocationType(Enum):
+    bikebox = 'bikebox'
+    cargobike = 'cargobike'
+
+
 class Location(db.Model, BaseModel):
     __tablename__ = 'location'
 
@@ -53,6 +59,7 @@ class Location(db.Model, BaseModel):
 
     name = db.Column(db.String(255), info={'description': 'public name'})
     slug = db.Column(db.String(255), index=True, unique=True, info={'description': 'slug'})
+    type = db.Column(db.Enum(LocationType))
 
     lat = db.Column(db.Numeric(precision=10, scale=7), info={'description': 'lat'})
     lon = db.Column(db.Numeric(precision=10, scale=7), info={'description': 'lon'})
@@ -64,7 +71,7 @@ class Location(db.Model, BaseModel):
     description = db.Column(db.Text, info={'description': 'public description'})
 
     osm_id = db.Column(db.BigInteger, info={'description': 'openstreetmap id'})
-    twentyforseven = db.Column(db.Boolean)
+    twentyfourseven = db.Column(db.Boolean)
 
     geometry = db.Column(Point(), nullable=False)
 

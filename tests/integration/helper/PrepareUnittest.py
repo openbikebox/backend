@@ -32,7 +32,7 @@ from webapp.app import launch
 from webapp.models import User, Operator, Hardware, Location, File, Pricegroup, Resource, ResourceAccess, ResourceGroup, \
     RegularHours
 from webapp.extensions import db
-from webapp.enum import ResourceStatus, ResourceGroupStatus
+from webapp.enum import ResourceStatus, ResourceGroupStatus, LocationType
 
 
 def prepare_unittest():
@@ -84,6 +84,7 @@ def prepare_unittest():
     db.session.commit()
 
     operator_bike = Operator()
+    operator_bike.future_booking = False
     operator_bike.name = 'Open Bike GmbH'
     operator_bike.address = 'Fahrradstraße 1'
     operator_bike.postalcode = '12345'
@@ -98,6 +99,7 @@ def prepare_unittest():
     db.session.commit()
 
     operator_cargo = Operator()
+    operator_cargo.future_booking = True
     operator_cargo.name = 'Open Cargo GmbH'
     operator_cargo.address = 'Fahrradstraße 1'
     operator_cargo.postalcode = '12345'
@@ -113,12 +115,15 @@ def prepare_unittest():
 
     hardware_small = Hardware()
     hardware_small.name = 'Einzel-Box'
+    hardware_small.future_booking = False
     db.session.add(hardware_small)
     hardware_big = Hardware()
     hardware_big.name = 'Sammel-Anlagen-Stellplatz'
+    hardware_big.future_booking = False
     db.session.add(hardware_big)
     hardware_cargo = Hardware()
     hardware_cargo.name = 'Cargo-Bike'
+    hardware_cargo.future_booking = True
     db.session.add(hardware_cargo)
     db.session.commit()
     db.session.commit()
@@ -133,6 +138,7 @@ def prepare_unittest():
     db.session.commit()
 
     location_small = Location()
+    location_small.type = LocationType.bikebox
     location_small.name = 'Fahrrad-Station Teststadt 1'
     location_small.slug = 'fahrrad-station-teststadt'
     location_small.address = 'Königswall 15'
@@ -157,6 +163,7 @@ def prepare_unittest():
     db.session.commit()
 
     location_big = Location()
+    location_small.type = LocationType.bikebox
     location_big.name = 'Fahrrad-Station Demostadt'
     location_big.slug = 'fahrrad-station-demo'
     location_big.address = 'Kurt-Schumacher-Platz 1'
@@ -250,6 +257,7 @@ def prepare_unittest():
     db.session.commit()
 
     resource_group_big = ResourceGroup()
+    location_small.type = LocationType.cargobike
     resource_group_big.name = 'Fahrrad-Station Demostadt'
     resource_group_big.slug = 'fahrrad-station-demostadt'
     resource_group_big.internal_identifier = 'demostadt-1'

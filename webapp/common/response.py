@@ -28,7 +28,7 @@ from ..extensions import logger
 from .helpers import DefaultJSONEncoder
 
 
-def json_response(data_dict, cors=False):
+def json_response(data_dict: Union[dict, list], cors=False):
     response = make_response(json.dumps(data_dict, cls=DefaultJSONEncoder))
     response.mimetype = 'application/json'
     if cors:
@@ -57,9 +57,11 @@ def jsonify_error(error: Union[dict, list, str] = 'common') -> Response:
     return jsonify(response)
 
 
-def svg_response(xml_tree):
+def svg_response(xml_tree: etree, cors: bool = False):
     response = make_response(etree.tostring(xml_tree, pretty_print=False, encoding='UTF-8', xml_declaration=True))
     response.mimetype = 'image/svg+xml'
+    if cors:
+        response.headers['Access-Control-Allow-Origin'] = '*'
     return response
 
 

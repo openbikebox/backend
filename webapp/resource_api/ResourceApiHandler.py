@@ -19,9 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from typing import List
-from flask import request, jsonify
+from datetime import date
+from sqlalchemy import or_, and_
 from ..models import Location, Action
-from ..common.response import svg_response, jsonify_success
+from ..common.response import error_response, success_response
+from ..common.helpers import get_now
+from ..enum import ActionStatus
 
 
 def locations_geojson(locations: List[Location]) -> dict:
@@ -45,7 +48,7 @@ def locations_geojson(locations: List[Location]) -> dict:
     }
 
 
-def locations_list(locations: List[Location]):
+def locations_list(locations: List[Location]) -> dict:
     result = []
     for location in locations:
         location_dict = location.to_dict(
@@ -56,15 +59,10 @@ def locations_list(locations: List[Location]):
         location_dict['ressource_count'] = location.resource.count()
         location_dict['booking_url'] = location.booking_url
         result.append(location_dict)
-    return result
+    return success_response(result)
 
 
-def get_location_reply(location: Location):
-    if request.args.get('format') == 'svg':
-        return svg_response(location.polygon_svg)
-    if request.args.get('format') == 'geojson':
-        return jsonify(location.polygon_geojson)
-
+def get_location_reply(location: Location) -> dict:
     result = location.to_dict(remove_none=True, ignore=['geometry'])
     result['booking_url'] = location.booking_url
     result['photo'] = location.photo.to_dict(
@@ -95,11 +93,55 @@ def get_location_reply(location: Location):
         ]
         item['predefined_dateranges'] = [item for item in ['day', 'week', 'month', 'year'] if getattr(resource.pricegroup, 'fee_%s' % item) is not None]
         result['resource'].append(item)
-    return jsonify_success(result)
+    return success_response(result)
 
 
-def get_resource_action_reply(resource_id: int):
-    return jsonify_success([
-        {'begin': action.begin, 'end': action.end}
-        for action in Action.query.with_entities(Action.begin, Action.end).filter_by(resource_id=resource_id).all()
-    ])
+def get_location_action_reply(location_id: int, begin_str: str, end_str: str):
+    try:
+        begin = date.fromisoformat(begin_str)
+        end = date.fromisoformat(end_str)
+    except (ValueError, TypeError):
+        return error_response('invalid date')
+    actions = Action.query\
+        .with_entities(Action.begin, Action.end, Action.resource_id)\
+        .filter_by(resource_id=location_id)\
+        .filter(Action.end > begin)\
+        .filter(Action.begin < end)\
+        .filter(or_(
+            Action.status == ActionStatus.booked,
+            and_(Action.status == ActionStatus.reserved, Action.valid_till > get_now())
+        ))\
+        .all()
+    result = []
+    for action in actions:
+        result.append({
+            'begin': action.begin,
+            'end': action.end,
+            'resource_id': action.resource_id
+        })
+    return success_response(result)
+
+
+def get_resource_action_reply(resource_id: int, begin_str: str, end_str: str) -> dict:
+    try:
+        begin = date.fromisoformat(begin_str)
+        end = date.fromisoformat(end_str)
+    except (ValueError, TypeError):
+        return error_response('invalid date')
+    actions = Action.query\
+        .with_entities(Action.begin, Action.end)\
+        .filter_by(resource_id=resource_id)\
+        .filter(Action.end > begin)\
+        .filter(Action.begin < end)\
+        .filter(or_(
+            Action.status == ActionStatus.booked,
+            and_(Action.status == ActionStatus.reserved, Action.valid_till > get_now())
+        ))\
+        .all()
+    result = []
+    for action in actions:
+        result.append({
+            'begin': action.begin,
+            'end': action.end
+        })
+    return success_response(result)

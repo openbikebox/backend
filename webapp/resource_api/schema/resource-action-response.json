@@ -6,9 +6,6 @@
   "items": {
     "type": "object",
     "properties": {
-      "resource_id": {
-        "type": "integer"
-      },
       "begin": {
         "type": "string",
         "format": "date"

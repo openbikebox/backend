@@ -29,4 +29,5 @@ class Hardware(db.Model, BaseModel):
     resource = db.relationship('Resource', backref='hardware', lazy='dynamic')
 
     name = db.Column(db.String(255), info={'description': 'name'})
+    future_booking = db.Column(db.Boolean)
 
