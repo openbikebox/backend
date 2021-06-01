@@ -22,6 +22,7 @@ pymysql
 email_validator
 mercantile
 lxml
+pytest
 click<8.0
 https://github.com/binary-butterfly/wtfjson/archive/refs/heads/master.tar.gz
 https://github.com/mapbox/vector-tile-base/archive/refs/heads/master.tar.gz

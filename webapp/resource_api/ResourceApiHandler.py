@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from typing import List
 from flask import request, jsonify
-from ..models import Location
+from ..models import Location, Action
 from ..common.response import svg_response, jsonify_success
 
 
@@ -89,6 +89,17 @@ def get_location_reply(location: Location):
                 fields=['id', 'id_url', 'created', 'modified', 'url', 'mimetype'],
                 remove_none=True
             )
+        item['photos'] = [
+            photo.to_dict(fields=['id', 'id_url', 'created', 'modified', 'url', 'mimetype'], remove_none=True)
+            for photo in resource.photos
+        ]
         item['predefined_dateranges'] = [item for item in ['day', 'week', 'month', 'year'] if getattr(resource.pricegroup, 'fee_%s' % item) is not None]
         result['resource'].append(item)
     return jsonify_success(result)
+
+
+def get_resource_action_reply(resource_id: int):
+    return jsonify_success([
+        {'begin': action.begin, 'end': action.end}
+        for action in Action.query.with_entities(Action.begin, Action.end).filter_by(resource_id=resource_id).all()
+    ])

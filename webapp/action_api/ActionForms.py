@@ -244,5 +244,12 @@ class ExtendForm(FlaskForm, SchemaForm):
         ],
         description='utc end of the rent. if not set the old daterange will be used.'
     )
+    predefined_daterange = StringField(
+        label='predefined range',
+        validators=[
+            validators.Optional(),
+            validators.AnyOf(['day', 'week', 'month', 'year'])
+        ]
+    )
     user_identifier = StringField()
 

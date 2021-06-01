@@ -21,10 +21,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 from flask import Blueprint, jsonify, abort, request
 from flask_cors import cross_origin
-from ..common.response import jsonify_success, log_request
+from ..common.response import jsonify_success
 from ..models import Location
 from ..extensions import api_documentation
-from .ResourceApiHandler import locations_geojson, get_location_reply, locations_list
+from .ResourceApiHandler import locations_geojson, get_location_reply, locations_list, get_resource_action_reply
 from ..api_documentation.ApiDocumentation import EndpointTag
 
 resource_api = Blueprint('resource', __name__)
@@ -131,4 +131,35 @@ def api_location_param():
         abort(404)
     return get_location_reply(location)
 
+
+@resource_api.route('/api/v1/resource/<int:resource_id>/actions')
+@api_documentation.register(
+    summary='getting actions of location',
+    tags=[EndpointTag.information],
+    args=[
+        {
+            'name': 'begin',
+            'description': 'begin of daterange',
+            'schema': {
+                'type': 'string',
+                'format': 'date'
+            },
+            'required': True
+        },
+        {
+            'name': 'end',
+            'description': 'end of daterange',
+            'schema': {
+                'type': 'string',
+                'format': 'date'
+            },
+            'required': True
+
+        },
+    ],
+    response_schema=os.path.join(os.path.dirname(os.path.realpath(__file__)), 'schema', 'location-action-response.json')
+)
+@cross_origin()
+def api_resource_actions(resource_id: int):
+    return get_resource_action_reply(resource_id)
 

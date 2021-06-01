@@ -104,7 +104,7 @@ class Action(db.Model, BaseModel):
         self.pricegroup_id = resource.pricegroup_id
         self.operator_id = resource.location.operator_id
         self.resource_cache = resource.to_json()
-        self.location_cache = resource.location.to_json()
+        self.location_cache = resource.location.to_json(ignore=['geometry'])
         self._location = resource.location
         self.resource_access_cache = resource.resource_access.to_json()
         self._resource_access = resource.resource_access
@@ -112,7 +112,6 @@ class Action(db.Model, BaseModel):
         self._pricegroup = resource.pricegroup
         self.operator_cache = resource.location.operator.to_json()
         self._operator = resource.location.operator
-
 
     @property
     def code(self) -> Union[str, None]:

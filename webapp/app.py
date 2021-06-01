@@ -26,7 +26,7 @@ from flask import Flask, request, jsonify
 from .config import Config
 from .common.constants import BaseConfig
 from .common.filter import register_global_filters
-from .extensions import db, mail, celery, redis, cors, auth
+from .extensions import db, mail, celery, redis, cors, auth, migrate
 
 # Blueprints
 from .gbfs import gbfs_controller
@@ -77,6 +77,7 @@ def configure_app(app):
 
 def configure_extensions(app):
     db.init_app(app)
+    migrate.init_app(app, db)
 
     @auth.verify_password
     def verify_password(username, password):

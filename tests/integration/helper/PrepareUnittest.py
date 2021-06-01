@@ -28,6 +28,7 @@ from datetime import datetime
 from urllib.parse import urlparse
 
 from flask import current_app
+from webapp.app import launch
 from webapp.models import User, Operator, Hardware, Location, File, Pricegroup, Resource, ResourceAccess, ResourceGroup, \
     RegularHours
 from webapp.extensions import db
@@ -35,6 +36,8 @@ from webapp.enum import ResourceStatus, ResourceGroupStatus
 
 
 def prepare_unittest():
+    launch().app_context().push()
+
     if current_app.config['MODE'] != 'DEVELOPMENT' or not current_app.config['DEBUG']:
         print('wrong mode')
         return
@@ -171,7 +174,7 @@ def prepare_unittest():
     location_cargo_file = File()
     location_cargo_file.mimetype = 'image/jpeg'
     copy2(
-        os.path.join(current_app.config['TESTS_DIR'], 'files', 'location-1.jpg'),
+        os.path.join(current_app.config['TESTS_DIR'], 'files', 'location-2.jpg'),
         os.path.join(current_app.config['FILES_DIR'], '4.jpg')
     )
     db.session.add(location_cargo_file)
@@ -301,14 +304,26 @@ def prepare_unittest():
             db.session.commit()
             counter += 1
 
-    resource_cargo_file = File()
-    resource_cargo_file.mimetype = 'image/jpeg'
+    resource_cargo_photo_main = File()
+    resource_cargo_photo_main.mimetype = 'image/jpeg'
     copy2(
-        os.path.join(current_app.config['TESTS_DIR'], 'files', 'location-1.jpg'),
-        os.path.join(current_app.config['FILES_DIR'], '4.jpg')
+        os.path.join(current_app.config['TESTS_DIR'], 'files', 'cargobike-1.jpg'),
+        os.path.join(current_app.config['FILES_DIR'], '5.jpg')
     )
-    db.session.add(resource_cargo_file)
+    db.session.add(resource_cargo_photo_main)
     db.session.commit()
+
+    resource_cargo_photos = []
+    for i in range(3):
+        resource_cargo_photo = File()
+        resource_cargo_photo.mimetype = 'image/jpeg'
+        copy2(
+            os.path.join(current_app.config['TESTS_DIR'], 'files', 'cargobike-%s.jpg' % ((i % 2) + 1)),
+            os.path.join(current_app.config['FILES_DIR'], '%s.jpg' % (6 + i))
+        )
+        db.session.add(resource_cargo_photo)
+        db.session.commit()
+        resource_cargo_photos.append(resource_cargo_photo)
 
     resource_cargo = Resource()
     resource_cargo.hardware_id = hardware_cargo.id
@@ -319,7 +334,8 @@ def prepare_unittest():
     resource_cargo.installed_at = datetime.utcnow()
     resource_cargo.user_identifier = 'cargobike-1'
     resource_cargo.internal_identifier = 'cargobike-1'
-    resource_cargo.photo_id = resource_cargo_file.id
+    resource_cargo.photo_id = resource_cargo_photo_main.id
+    resource_cargo.photos = resource_cargo_photos
     db.session.add(resource_cargo)
     db.session.commit()
 
