@@ -158,6 +158,8 @@ def api_location_param():
         abort(404)
     if request.args.get('format') == 'svg':
         return svg_response(location.polygon_svg)
+    if request.args.get('format') == 'geojson':
+        return jsonify(location.polygon_geojson)
     return jsonify(get_location_reply(location))
 
 
