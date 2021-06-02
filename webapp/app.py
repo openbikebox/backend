@@ -30,6 +30,7 @@ from .extensions import db, mail, celery, redis, cors, auth, migrate
 
 # Blueprints
 from .gbfs import gbfs_controller
+from .park_api import park_api_controller
 from .tiles import tiles_controller
 from .frontend import frontend
 from .action_api import action_api
@@ -45,6 +46,7 @@ BLUEPRINTS = [
     resource_api,
     api_documentation_blueprint,
     gbfs_controller,
+    park_api_controller,
     tiles_controller,
     reputation_cli
 ]
