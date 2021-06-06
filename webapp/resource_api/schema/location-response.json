@@ -245,11 +245,6 @@
             "format": "date-time",
             "description": "datetime when resource was installed"
           },
-          "unavailable_until": {
-            "type": "string",
-            "format": "date-time",
-            "description": "datetime until when the resource will be booked. this parameter will be replaced by a more dynamic concept in a later version"
-          },
           "pricegroup": {
             "type": "object",
             "description": "pricegroup used at this resource",

@@ -24,15 +24,17 @@ from flask import current_app
 from ..extensions import db
 from ..models import Action, Resource
 from ..common.response import error_response, success_response
-from ..enum import ActionStatus, ResourceStatus
-from ..common.helpers import get_now, get_current_time_local, unlocalize_datetime
+from ..enum import ActionStatus
+from ..common.helpers import get_now
 from ..common.exceptions import BikeBoxAccessDeniedException, BikeBoxNotExistingException
-from .ActionApiHelper import check_reservation_timeout
 from .ActionForms import ReserveForm, BookingForm, CancelForm, RenewForm, ExtendForm
+from ..services.action.ActionHelper import calculate_price, calculate_begin_end, check_reservation_timeout_delay
+from ..services.resource.ResourceHelper import resource_free_between
+from ..services.resource.ResourceStatusService import update_resource_status_delay
 
 
 def action_reserve_handler(data: dict, source: str) -> dict:
-    form = ReserveForm(data=data)
+    form = ReserveForm(data)
     if not form.validate():
         return error_response(form.errors)
     resource = Resource.query.get(form.resource_id.data)
@@ -40,41 +42,32 @@ def action_reserve_handler(data: dict, source: str) -> dict:
         return error_response('invalid resource')
     if resource.location.operator.id not in current_app.config['BASICAUTH'][source]['capabilities']:
         return error_response('client is not allowed to book the resource')
-    if resource.status != ResourceStatus.free:
-        return error_response('resource not free')
     if not (form.predefined_daterange.data or (form.begin.data and form.end.data)):
         return error_response('either begin + end or predefined_daterange is required')
-    if form.predefined_daterange.data:
-        begin = get_current_time_local().replace(microsecond=0)
-        form.begin.data = unlocalize_datetime(begin).strftime('%Y-%m-%dT%H:%M:%SZ')
-        if form.predefined_daterange.data == 'day':
-            form.end.data = unlocalize_datetime((begin + timedelta(days=2)).replace(hour=0, minute=0, second=0)).strftime('%Y-%m-%dT%H:%M:%SZ')
-        elif form.predefined_daterange.data == 'week':
-            form.end.data = unlocalize_datetime((begin + timedelta(days=8)).replace(hour=0, minute=0, second=0)).strftime('%Y-%m-%dT%H:%M:%SZ')
-        elif form.predefined_daterange.data == 'month':
-            form.end.data = unlocalize_datetime((begin + timedelta(days=32)).replace(hour=0, minute=0, second=0)).strftime('%Y-%m-%dT%H:%M:%SZ')
-        else:
-            form.end.data = unlocalize_datetime((begin + timedelta(days=366)).replace(hour=0, minute=0, second=0)).strftime('%Y-%m-%dT%H:%M:%SZ')
+    if form.begin.data and form.begin.data > (get_now() + timedelta(minutes=2)) and not resource.future_booking:
+        return error_response('resource does not allow future booking')
+    begin, end = calculate_begin_end(form.predefined_daterange.data, form.begin.data, form.end.data)
+    if not resource_free_between(resource.id, begin, end):
+        return error_response('resource not free')
+
     action = Action()
-    form.populate_obj(action)
+    form.populate_obj(action, exclude=['begin', 'end'])
+    action.begin = begin
+    action.end = end
     action.set_cache(resource)
-    if not action.calculate():
+    if not calculate_price(action):
         return error_response('price not set for this daterange')
     action.valid_till = get_now() + timedelta(minutes=current_app.config['RESERVE_MINUTES'])
     action.source = source
-    resource.status = ResourceStatus.reserved
-    resource.unavailable_until = get_now() + timedelta(minutes=current_app.config['RESERVE_MINUTES'])
-    db.session.add(resource)
     db.session.add(action)
     db.session.commit()
 
-    check_reservation_timeout.apply_async((resource.id, action.id), countdown=60 * current_app.config['RESERVE_MINUTES'])
-
+    check_reservation_timeout_delay.apply_async((resource.id, action.id), countdown=60 * current_app.config['RESERVE_MINUTES'])
     return success_response(action.to_dict(extended=True, remove_none=True))
 
 
 def action_cancel_handler(data: dict, source: str) -> dict:
-    form = CancelForm(data=data)
+    form = CancelForm(data)
     if not form.validate():
         return error_response(form.errors)
     try:
@@ -82,7 +75,7 @@ def action_cancel_handler(data: dict, source: str) -> dict:
     except BikeBoxNotExistingException:
         return error_response('action does not exist')
     if action.status == ActionStatus.cancelled:
-        return error_response('action already free')
+        return error_response('action already cancelled')
     if action.status == ActionStatus.booked:
         return error_response('action already booked')
     if action.source != source:
@@ -90,18 +83,12 @@ def action_cancel_handler(data: dict, source: str) -> dict:
     action.status = ActionStatus.cancelled
     db.session.add(action)
 
-    resource = action.resource
-    if resource.status == ResourceStatus.reserved:
-        resource.status = ResourceStatus.free
-        resource.unavailable_until = None
-        db.session.add(resource)
-
     db.session.commit()
     return success_response(action.to_dict(extended=True, remove_none=True))
 
 
 def action_renew_handler(data: dict, source: str) -> dict:
-    form = RenewForm(data=data)
+    form = RenewForm(data)
     if not form.validate():
         return error_response(form.errors)
     try:
@@ -113,34 +100,22 @@ def action_renew_handler(data: dict, source: str) -> dict:
     if action.source != source:
         return error_response('invalid source')
     resource = action.resource
-    if resource.status not in [ResourceStatus.free, ResourceStatus.reserved] and resource.unavailable_until > action.begin:
+    if not resource_free_between(resource.id, action.begin, action.end, exclude_ids=[action.id]):
         return error_response('resource not free')
 
     action.valid_till = get_now() + timedelta(minutes=current_app.config['RESERVE_MINUTES'])
     action.status = ActionStatus.reserved
     db.session.add(action)
-
-    resource.status = ResourceStatus.reserved
-    resource.unavailable_until = get_now() + timedelta(minutes=current_app.config['RESERVE_MINUTES'])
-    db.session.add(resource)
+    check_reservation_timeout_delay.apply_async((action.resource_id, action.id), countdown=60 * current_app.config['RESERVE_MINUTES'])
 
     db.session.commit()
     return success_response(action.to_dict(extended=True, remove_none=True))
 
 
 def action_book_handler(data: dict, source: str) -> dict:
-    form = BookingForm(data=data)
+    form = BookingForm(data)
     if not form.validate():
-        return {
-            'status': -1,
-            'errors': form.errors
-        }
-    # TODO: use new validation system to prevent manual check
-    if 'token' not in data \
-            or not len(data['token']) \
-            or 'type' not in data['token'][0] \
-            or data['token'][0]['type'] != 'code':
-        return error_response('invalid token')
+        error_response(form.errors)
     try:
         action = Action.apiget(form.uid.data, form.request_uid.data, form.session.data)
     except BikeBoxNotExistingException:
@@ -152,63 +127,55 @@ def action_book_handler(data: dict, source: str) -> dict:
     if action.source != source:
         return error_response('invalid source')
     resource = action.resource
-    if resource.status not in [ResourceStatus.free, ResourceStatus.reserved] and resource.unavailable_until > action.begin:
+    if not resource_free_between(resource.id, action.begin, action.end, exclude_ids=[action.id]):
         return error_response('resource not free')
     form.populate_obj(action)
-    if 'identifier' in data['token'][0] and data['token'][0]['identifier'] is not None:
-        action.pin = data['token'][0]['identifier']
+    if form.token.entries[0].fields.identifier.data:
+        action.pin = form.token.entries[0].fields.identifier.data
     else:
         action.pin = '%04d' % randint(0, 9999)
     action.status = ActionStatus.booked
 
-    resource.status = ResourceStatus.taken
-    resource.unavailable_until = action.end
+    update_resource_status_delay.delay(resource.id)
     db.session.add(resource)
 
     db.session.add(action)
     db.session.commit()
-
     return success_response(action.to_dict(extended=True, remove_none=True))
 
 
 def action_extend_handler(data: dict, source: str):
-    form = ExtendForm(data=data)
+    form = ExtendForm(data)
     if not form.validate():
         return error_response(form.errors)
     try:
         old_action = Action.apiget(form.old_uid.data, form.old_request_uid.data, form.old_session.data)
     except BikeBoxNotExistingException:
         return error_response('action does not exist')
+    resource = Resource.query.get(old_action.resource_id)
 
     if old_action.status != ActionStatus.booked:
         return error_response('old action was not booked')
     if old_action.end < get_now():
         return error_response('old action already ended')
+    if form.begin.data and form.begin.data > (get_now() + timedelta(minutes=2)):
+        return error_response('extending booking infuture booking')
+    autocalculated_end = (old_action.end + (old_action.end - old_action.begin) + timedelta(hours=1)).replace(hour=0)
+    begin, end = calculate_begin_end(form.predefined_daterange.data, old_action.end, form.end.data or autocalculated_end)
+    if not resource_free_between(resource.id, begin, end):
+        return error_response('resource not free')
 
     action = Action()
-    form.populate_obj(action)
-    if form.predefined_daterange.data:
-        begin = get_now().replace(microsecond=0)
-        form.begin.data = begin.strftime('%Y-%m-%dT%H:%M:%SZ')
-        if form.predefined_daterange.data == 'day':
-            form.end.data = (begin + timedelta(days=2)).replace(hour=0, minute=0, second=0).strftime('%Y-%m-%dT%H:%M:%SZ')
-        elif form.predefined_daterange.data == 'week':
-            form.end.data = (begin + timedelta(days=8)).replace(hour=0, minute=0, second=0).strftime('%Y-%m-%dT%H:%M:%SZ')
-        elif form.predefined_daterange.data == 'month':
-            form.end.data = (begin + timedelta(days=32)).replace(hour=0, minute=0, second=0).strftime('%Y-%m-%dT%H:%M:%SZ')
-        else:
-            form.end.data = (begin + timedelta(days=366)).replace(hour=0, minute=0, second=0).strftime('%Y-%m-%dT%H:%M:%SZ')
-    elif not form.begin.data or not form.end.data:
-        action.begin = old_action.end
-        action.end = action.begin + (old_action.end - old_action.begin)
-    action.set_cache(old_action.resource)
-    if not action.calculate():
+    form.populate_obj(action, exclude=['begin', 'end'])
+    action.begin = begin
+    action.end = end
+    action.set_cache(resource)
+    if not calculate_price(action):
         return error_response('price not set for this daterange')
     action.valid_till = get_now() + timedelta(minutes=current_app.config['RESERVE_MINUTES'])
     action.source = source
     db.session.add(action)
     db.session.commit()
 
-    check_reservation_timeout.apply_async((action.resource_id, action.id), countdown=60 * current_app.config['RESERVE_MINUTES'])
-
+    check_reservation_timeout_delay.apply_async((action.resource_id, action.id), countdown=60 * current_app.config['RESERVE_MINUTES'])
     return success_response(action.to_dict(extended=True, remove_none=True))

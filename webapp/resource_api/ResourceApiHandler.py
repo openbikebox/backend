@@ -79,7 +79,7 @@ def get_location_reply(location: Location) -> dict:
     for resource in location.resource:
         item = resource.to_dict(fields=[
             'id', 'id_url', 'created', 'modified', 'slug', 'user_identifier', 'maintenance_from', 'maintenance_till',
-            'status', 'installed_at', 'unavailable_until', 'description'
+            'status', 'installed_at', 'description'
         ], remove_none=True)
         item['pricegroup'] = resource.pricegroup.to_dict(ignore=['operator_id'], remove_none=True)
         if resource.photo_id:
@@ -104,7 +104,7 @@ def get_location_action_reply(location_id: int, begin_str: str, end_str: str):
         return error_response('invalid date')
     actions = Action.query\
         .with_entities(Action.begin, Action.end, Action.resource_id)\
-        .filter_by(resource_id=location_id)\
+        .filter_by(location_id=location_id)\
         .filter(Action.end > begin)\
         .filter(Action.begin < end)\
         .filter(or_(

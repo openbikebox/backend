@@ -24,11 +24,11 @@ from .option import Option
 from .hardware import Hardware
 from .operator import Operator
 from .pricegroup import Pricegroup
+from .action import Action
 from .location import Location
 from .resource_group import ResourceGroup
 from .resource_access import ResourceAccess
 from .resource import Resource
 from .file import File
-from .action import Action
 from .alert import Alert
 from .regular_hours import RegularHours

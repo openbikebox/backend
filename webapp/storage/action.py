@@ -20,12 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from enum import Enum
 from uuid import uuid4
-from typing import Union
+from typing import Union, TYPE_CHECKING
 from datetime import datetime, timedelta
 from ..extensions import db
-from .base import BaseModel
 from ..common.helpers import get_passcode, localize_datetime
 from ..common.exceptions import BikeBoxAccessDeniedException, BikeBoxNotExistingException
+from .base import BaseModel
 from .resource_access import ResourceAccess
 from .resource import Resource
 from .location import Location
@@ -86,18 +86,7 @@ class Action(db.Model, BaseModel):
         self.uid = str(uuid4())
         self.session = get_passcode(64)
 
-    def calculate(self) -> bool:
-        if not self.resource or not self.operator or not self.begin or not self.end:
-            return False
-        self.value_gross = getattr(self.pricegroup, 'fee_%s' % Pricegroup.get_timespan(self.begin, self.end))
-        if not self.value_gross:
-            return False
-        self.tax_rate = self.operator.tax_rate
-        self.value_tax = self.value_gross / (1 + self.tax_rate) * self.tax_rate
-        self.value_net = self.value_gross - self.value_tax
-        return True
-
-    def set_cache(self, resource: Resource):
+    def set_cache(self, resource: 'Resource'):
         self.resource_id = resource.id
         self.location_id = resource.location_id
         self.resource_access_id = resource.resource_access_id
@@ -106,8 +95,9 @@ class Action(db.Model, BaseModel):
         self.resource_cache = resource.to_json()
         self.location_cache = resource.location.to_json(ignore=['geometry'])
         self._location = resource.location
-        self.resource_access_cache = resource.resource_access.to_json()
-        self._resource_access = resource.resource_access
+        if resource.resource_access_id:
+            self.resource_access_cache = resource.resource_access.to_json()
+            self._resource_access = resource.resource_access
         self.pricegroup_cache = resource.pricegroup.to_json()
         self._pricegroup = resource.pricegroup
         self.operator_cache = resource.location.operator.to_json()
@@ -123,31 +113,31 @@ class Action(db.Model, BaseModel):
         return None
 
     @property
-    def location(self) -> Union[Location, None]:
+    def location(self) -> Union['Location', None]:
         if not self._location:
             self._location = Location.query.get(self.location_id)
         return self._location
 
     @property
-    def resource(self) -> Union[Resource, None]:
+    def resource(self) -> Union['Resource', None]:
         if not self._resource:
             self._resource = Resource.query.get(self.resource_id)
         return self._resource
 
     @property
-    def pricegroup(self) -> Union[Resource, None]:
+    def pricegroup(self) -> Union['Resource', None]:
         if not self._pricegroup:
             self._pricegroup = Pricegroup.query.get(self.pricegroup_id)
         return self._pricegroup
 
     @property
-    def resource_access(self) -> Union[ResourceAccess, None]:
+    def resource_access(self) -> Union['ResourceAccess', None]:
         if not self._resource_access:
             self._resource_access = ResourceAccess.query.get(self.resource_access_id)
         return self._resource_access
 
     @property
-    def operator(self) -> Union[Operator, None]:
+    def operator(self) -> Union['Operator', None]:
         if not self._operator:
             self._operator = Operator.query.get(self.operator_id)
         return self._operator
@@ -178,7 +168,7 @@ class Action(db.Model, BaseModel):
         result['token'] = [{
             'type': 'code',
             'identifier': self.pin,
-            'secret': self.code if self.code else '00000',
+            'secret': self.code if self.code is not None else '00000',
             'date': (self.end - timedelta(hours=3)).strftime('%Y%m%d')
         }]
         if 'pin' in result:

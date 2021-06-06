@@ -18,238 +18,64 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from flask_wtf import FlaskForm
-from wtforms import validators
-from wtforms import IntegerField, StringField, FieldList, FormField
-from ..common.form import SchemaForm
-from ..common.form_validator import ValidateDateTime, ValidateDateTimeRange
-from ..common.form_field import DateTimeField
-from ..common.form_filter import normalize_utc
+from datetime import timedelta
+from wtfjson import DictInput
+from wtfjson.fields import IntegerField, StringField, DateTimeField, ListField, ObjectField
+from wtfjson.validators import NumberRange, Length, AnyOf, DateTimeRange
 
 
-class ReserveForm(FlaskForm, SchemaForm):
-    class Meta:
-        csrf = False
-        schema_id = 'action-reservation'
-        schema_title = 'reservation'
-        schema_description = 'this is the initial request sent to the booking system. usually its done when a customer puts something in her cart.'
-
-    request_uid = StringField(
-        label='request uid',
-        validators=[
-            validators.DataRequired(),
-            validators.Length(min=16)
-        ],
-        description='this uid is the client side identifier for the whole transaction'
-    )
-    resource_id = IntegerField(
-        label='resource',
-        validators=[
-            validators.DataRequired(),
-            validators.NumberRange(min=1)
-        ],
-        description='the identifier of the ressource'
-    )
+class ReserveForm(DictInput):
+    request_uid = StringField(validators=[Length(min=16)])
+    resource_id = IntegerField(validators=[NumberRange(min=1)])
     requested_at = DateTimeField(
-        label='requested_at',
-        validators=[
-            validators.DataRequired(),
-            ValidateDateTime(),
-            ValidateDateTimeRange(plus=120, minus=120)
-        ],
-        filters=[
-            normalize_utc
-        ],
-        description='the utc moment when the reservation was created'
+        validators=[DateTimeRange(minus=timedelta(minutes=-2), plus=timedelta(minutes=2))],
+        accept_utc=True
     )
     predefined_daterange = StringField(
-        label='predefined range',
-        validators=[
-            validators.Optional(),
-            validators.AnyOf(['day', 'week', 'month', 'year'])
-        ]
+        validators=[AnyOf(['day', 'week', 'month', 'year'])],
+        required=False
     )
-    begin = DateTimeField(
-        label='begin',
-        validators=[
-            validators.Optional(),
-            ValidateDateTime()
-        ],
-        filters=[
-            normalize_utc
-        ],
-        description='utc begin of the rent'
-    )
-    end = DateTimeField(
-        label='end',
-        validators=[
-            validators.Optional(),
-            ValidateDateTime()
-        ],
-        filters=[
-            normalize_utc
-        ],
-        description='utc end of the rent'
-    )
-    user_identifier = StringField()
+    begin = DateTimeField(required=False, accept_utc=True)
+    end = DateTimeField(required=False, accept_utc=True)
+    user_identifier = StringField(required=False)
 
 
-class BaseUpdateForm(FlaskForm, SchemaForm):
-    uid = StringField(
-        label='uid',
-        validators=[
-            validators.DataRequired()
-        ],
-        description='unique transaction identifier provided at reservation'
-    )
-    request_uid = StringField(
-        label='request uid',
-        validators=[
-            validators.DataRequired()
-        ],
-        description='this uid is the client side identifier for the whole transaction'
-    )
-    session = StringField(
-        label='session',
-        validators=[
-            validators.DataRequired()
-        ],
-        description='session string provided at reservation'
-    )
+class BaseUpdateForm(DictInput):
+    uid = StringField(validators=[Length(min=32)])
+    request_uid = StringField(validators=[Length(min=16)])
+    session = StringField(validators=[Length(min=32)])
 
 
 class CancelForm(BaseUpdateForm):
-    class Meta:
-        csrf = False
-        schema_id = 'action-cancel'
-        schema_title = 'cancel'
-        schema_description = 'this is the request which is sent when the customer cancels a reservation.'
+    pass
 
 
 class RenewForm(BaseUpdateForm):
-    class Meta:
-        csrf = False
-        schema_id = 'action-renew'
-        schema_title = 'renew'
-        schema_description = 'this is the request which is sent when the customer renews a reservation.'
+    pass
+
+
+class BookingTokenForm(DictInput):
+    type = StringField(validators=[AnyOf(['code', 'connect'])])
+    identifier = StringField(required=False)
 
 
 class BookingForm(BaseUpdateForm):
-    class Meta:
-        csrf = False
-        schema_id = 'action-book'
-        schema_title = 'book'
-        schema_description = 'this is the request which is sent when the customer paid a reservation.'
-
-    uid = StringField(
-        label='uid',
-        validators=[
-            validators.DataRequired()
-        ],
-        description='unique transaction identifier provided at reservation'
-    )
-    request_uid = StringField(
-        label='request uid',
-        validators=[
-            validators.DataRequired()
-        ],
-        description='this uid is the client side identifier for the whole transaction'
-    )
-    session = StringField(
-        label='session',
-        validators=[
-            validators.DataRequired()
-        ],
-        description='session string provided at reservation'
-    )
-    paid_at = DateTimeField(
-        label='paid at',
-        validators=[
-            ValidateDateTime()
-        ],
-        filters=[
-            normalize_utc
-        ],
-        description='the utc moment when the payment was done'
-    )
-    user_identifier = StringField()
+    paid_at = DateTimeField(accept_utc=True)
+    user_identifier = StringField(required=False)
+    token = ListField(ObjectField(BookingTokenForm), min_entries=1)
 
 
-class ExtendForm(FlaskForm, SchemaForm):
-    class Meta:
-        csrf = False
-        schema_id = 'action-extend'
-        schema_title = 'book'
-        schema_description = 'this is the request which is sent when wants to extend a reservation.'
-
-    old_uid = StringField(
-        label='uid',
-        validators=[
-            validators.DataRequired()
-        ],
-        description='unique transaction identifier provided at reservation'
-    )
-    old_request_uid = StringField(
-        label='request uid',
-        validators=[
-            validators.DataRequired()
-        ],
-        description='this uid is the client side identifier for the whole transaction'
-    )
-    old_session = StringField(
-        label='session',
-        validators=[
-            validators.DataRequired()
-        ],
-        description='session string provided at reservation'
-    )
-    request_uid = StringField(
-        label='request uid',
-        validators=[
-            validators.DataRequired()
-        ],
-        description='this uid is the client side identifier for the whole transaction'
-    )
+class ExtendForm(DictInput):
+    old_uid = StringField()
+    old_request_uid = StringField()
+    old_session = StringField()
+    request_uid = StringField()
     requested_at = DateTimeField(
-        label='requested_at',
-        validators=[
-            validators.DataRequired(),
-            ValidateDateTime(),
-            ValidateDateTimeRange(plus=120, minus=120)
-        ],
-        filters=[
-            normalize_utc
-        ],
-        description='the utc moment when the reservation was created'
+        validators=[DateTimeRange(minus=timedelta(minutes=-2), plus=timedelta(minutes=2))],
+        accept_utc=True
     )
-    begin = DateTimeField(
-        label='begin',
-        validators=[
-            validators.Optional(),
-            ValidateDateTime()
-        ],
-        filters=[
-            normalize_utc
-        ],
-        description='utc begin of the rent. if not set the old daterange will be used.'
-    )
-    end = DateTimeField(
-        label='end',
-        validators=[
-            validators.Optional(),
-            ValidateDateTime()
-        ],
-        filters=[
-            normalize_utc
-        ],
-        description='utc end of the rent. if not set the old daterange will be used.'
-    )
-    predefined_daterange = StringField(
-        label='predefined range',
-        validators=[
-            validators.Optional(),
-            validators.AnyOf(['day', 'week', 'month', 'year'])
-        ]
-    )
-    user_identifier = StringField()
+    begin = DateTimeField(required=False, accept_utc=True)
+    end = DateTimeField(required=False, accept_utc=True)
+    predefined_daterange = StringField(validators=[AnyOf(['day', 'week', 'month', 'year'])], required=False)
+    user_identifier = StringField(required=False)
 

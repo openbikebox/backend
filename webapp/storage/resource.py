@@ -65,7 +65,7 @@ class Resource(db.Model, BaseModel):
     internal_identifier = db.Column(db.String(255), info={'description': 'internal identifier'})
     user_identifier = db.Column(db.String(255), info={'description': 'user readable identifier'})
     status = db.Column(db.Enum(ResourceStatus), info={'description': 'current status, does not include booking status'})
-    unavailable_until = db.Column(db.DateTime, info={'description': 'booked until'})
+    unavailable_until = db.Column(db.DateTime, info={'description': 'booked until'})  # to delete
     installed_at = db.Column(db.DateTime, info={'description': 'installed at'})
     maintenance_from = db.Column(db.DateTime, info={'description': 'location id'})
     maintenance_till = db.Column(db.DateTime, info={'description': 'location id'})

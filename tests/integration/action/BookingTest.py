@@ -77,7 +77,6 @@ class BookingTest(BaseIntegrationTestCase):
             'requested_at': datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'),
             'resource_id': resource.id
         }, 'integration-test')
-        print(json.dumps(reservation, cls=DefaultJSONEncoder))
         assert type(reservation) is dict
         assert 'error' not in reservation
         assert reservation['status'] == 0

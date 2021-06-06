@@ -40,7 +40,6 @@ class BookingTest(BaseIntegrationTestCase):
             'requested_at': datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'),
             'resource_id': resource.id
         }, 'integration-test')
-
         uid = reservation['data']['uid']
         session = reservation['data']['session']
 

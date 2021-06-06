@@ -123,6 +123,15 @@ def get_now() -> datetime:
     return datetime.utcnow()
 
 
+def get_local_now() -> datetime:
+    """
+    helper which normally gives back current utc datetime, but can be modified for tests
+    :return: utc datetime
+    """
+    return datetime.now()
+
+
+
 def get_today() -> date:
     """
     helper which normally gives back today, but can be modified for tests

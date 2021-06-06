@@ -19,14 +19,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import click
-from ..services.resource.ResetService import free_resource_worker
+from ..services.resource.ResourceStatusService import queue_status_checks
 from ..services.resource.FillLocationService import fill_location
 from .ResourceApiController import resource_api
 
 
-@resource_api.cli.command("free", help='should run a short time after midnight')
-def cli_free_resource_worker():
-    free_resource_worker()
+@resource_api.cli.command("queue_status_checks", help='should run a short time after midnight')
+def cli_queue_status_checks():
+    queue_status_checks()
 
 
 @resource_api.cli.command("create")
