@@ -85,7 +85,6 @@ class BookingTest(BaseIntegrationTestCase):
         session = reservation['data']['session']
         assert len(uid) == 36
         assert len(session) == 64
-
         booked = action_book_handler({
             'paid_at': datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'),
             'request_uid': request_uid,

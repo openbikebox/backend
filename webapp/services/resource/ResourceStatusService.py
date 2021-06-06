@@ -69,7 +69,7 @@ def update_resource_status(resource_id: Optional[int] = None, resource: Optional
     resource = Resource.query.get(resource_id) if resource is None else resource
     if resource.status in [ResourceStatus.faulted, ResourceStatus.inactive]:
         return
-    new_status = resource_status_at(resource_id, get_now())
+    new_status = resource_status_at(resource.id, get_now())
     if resource.status == new_status:
         return
     resource.status = new_status

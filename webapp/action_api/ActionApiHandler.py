@@ -30,7 +30,7 @@ from ..common.exceptions import BikeBoxAccessDeniedException, BikeBoxNotExisting
 from .ActionForms import ReserveForm, BookingForm, CancelForm, RenewForm, ExtendForm
 from ..services.action.ActionHelper import calculate_price, calculate_begin_end, check_reservation_timeout_delay
 from ..services.resource.ResourceHelper import resource_free_between
-from ..services.resource.ResourceStatusService import update_resource_status_delay
+from ..services.resource.ResourceStatusService import update_resource_status_delay, update_resource_status
 
 
 def action_reserve_handler(data: dict, source: str) -> dict:
@@ -61,7 +61,7 @@ def action_reserve_handler(data: dict, source: str) -> dict:
     action.source = source
     db.session.add(action)
     db.session.commit()
-
+    update_resource_status(resource=resource)
     check_reservation_timeout_delay.apply_async((resource.id, action.id), countdown=60 * current_app.config['RESERVE_MINUTES'])
     return success_response(action.to_dict(extended=True, remove_none=True))
 
@@ -82,8 +82,8 @@ def action_cancel_handler(data: dict, source: str) -> dict:
         return error_response('invalid source')
     action.status = ActionStatus.cancelled
     db.session.add(action)
-
     db.session.commit()
+    update_resource_status_delay.delay(action.resource_id)
     return success_response(action.to_dict(extended=True, remove_none=True))
 
 

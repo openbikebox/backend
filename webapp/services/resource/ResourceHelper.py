@@ -46,11 +46,11 @@ def resource_free_between(
 def resource_status_at(resource_id: int, moment: datetime) -> ResourceStatus:
     actions = Action.query \
         .with_entities(Action.id) \
-        .filter_by(resource_id=resource_id) \
-        .filter(Action.begin < moment) \
-        .filter(Action.end > moment) \
+        .filter(Action.resource_id == resource_id) \
+        .filter(Action.begin <= moment) \
+        .filter(Action.end >= moment) \
         .filter(or_(
             Action.status == ActionStatus.booked,
             and_(Action.status == ActionStatus.reserved, Action.valid_till > get_now())
         ))
-    return ResourceStatus.free if actions.count() == 0 else ResourceStatus.booked
+    return ResourceStatus.free if actions.count() == 0 else ResourceStatus.taken

@@ -24,7 +24,12 @@ RUN apt-get install -y \
         inotify-tools \
         wait-for-it \
         git \
-        wget
+        wget \
+        tzdata
+
+ENV TZ=Europe/Berlin
+RUN ln -fs /usr/share/zoneinfo/Europe/Berlin /etc/localtime
+RUN dpkg-reconfigure --frontend noninteractive tzdata
 
 RUN ln -s /usr/bin/python3 /usr/bin/python
 
