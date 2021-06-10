@@ -35,6 +35,8 @@ class Pricegroup(db.Model, BaseModel):
     fee_week = db.Column(db.Numeric(precision=7, scale=4), default=0)
     fee_month = db.Column(db.Numeric(precision=7, scale=4), default=0)
     fee_year = db.Column(db.Numeric(precision=7, scale=4), default=0)
+    detailed_calculation = db.Column(db.Boolean)
+    max_booking_time = db.Column(db.Integer)
 
     @classmethod
     def get_timespan(cls, begin, end):

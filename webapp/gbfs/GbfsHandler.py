@@ -73,18 +73,18 @@ def handle_gbfs_index(operator_id: int) -> GbfsResponse:
     })
 
 
-def handle_gbfs_gbfs_versions(operator_id: int):
-    return {
+def handle_gbfs_gbfs_versions(operator_id: int) ->GbfsResponse:
+    return GbfsResponse({
         "versions": [
             {
                 "version": "2.2",
                 "url": "%s/api/gbfs/2.2/%s/gbfs.json" % (current_app.config['PROJECT_URL'], operator_id)
             }
         ]
-    }
+    })
 
 
-def handle_gbfs_system_information(operator_id):
+def handle_gbfs_system_information(operator_id: int) -> GbfsResponse:
     operator = Operator.query.get_or_404(operator_id)
     return GbfsResponse({
         "language": "DE",
@@ -98,7 +98,7 @@ def handle_gbfs_system_information(operator_id):
     }, operator.modified.timestamp())
 
 
-def handle_gbfs_station_information(operator_id: int):
+def handle_gbfs_station_information(operator_id: int) -> GbfsResponse:
     operator = Operator.query.get_or_404(operator_id)
     location_dicts = []
     locations = Location.query.filter_by(operator_id=operator_id).all()
@@ -124,7 +124,7 @@ def handle_gbfs_station_information(operator_id: int):
     )
 
 
-def handle_gbfs_station_status(operator_id):
+def handle_gbfs_station_status(operator_id: int) -> GbfsResponse:
     Operator.query.get_or_404(operator_id)
     locations = []
     resources = Resource.query\
@@ -158,7 +158,7 @@ def handle_gbfs_station_status(operator_id):
     )
 
 
-def handle_gbfs_system_alerts(operator_id):
+def handle_gbfs_system_alerts(operator_id: int) -> GbfsResponse:
     operator = Operator.query.get_or_404(operator_id)
     alerts = Alert.query\
         .filter(or_(Alert.operator_id == operator.id, Alert.locations.any(Location.operator_id == operator_id)))\
@@ -190,7 +190,7 @@ def handle_gbfs_system_alerts(operator_id):
     )
 
 
-def handle_gbfs_system_hours(operator_id):
+def handle_gbfs_system_hours(operator_id: int) -> GbfsResponse:
     operator = Operator.query.get_or_404(operator_id)
     return GbfsResponse(
         {'rental_hours': []},
@@ -198,7 +198,7 @@ def handle_gbfs_system_hours(operator_id):
     )
 
 
-def handle_gbfs_vehicle_types(operator_id):
+def handle_gbfs_vehicle_types(operator_id: int) -> GbfsResponse:
     return GbfsResponse({
         "vehicle_types": [
             {

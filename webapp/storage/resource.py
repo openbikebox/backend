@@ -20,8 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from enum import Enum
 from lxml import etree
+from typing import TYPE_CHECKING
 from ..extensions import db
 from .base import BaseModel
+if TYPE_CHECKING:
+    from .location import Location
 
 
 class ResourceStatus(Enum):
@@ -84,6 +87,10 @@ class Resource(db.Model, BaseModel):
     @property
     def future_booking(self):
         return self.location.operator.future_booking and self.hardware.future_booking
+
+    @property
+    def location(self) -> 'Location':
+        return getattr(self, 'location_query')
 
     @property
     def polygon_geojson(self) -> dict:

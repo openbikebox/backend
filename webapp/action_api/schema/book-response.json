@@ -49,6 +49,13 @@
       "enum": ["booked"],
       "description": "reservation"
     },
+    "auth_methods": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["code", "connect"]
+      }
+    },
     "value_gross": {
       "type": "string",
       "pattern": "^[+-]?\\d+(\\.\\d+)?$",

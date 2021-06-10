@@ -50,6 +50,14 @@ class CancelForm(BaseUpdateForm):
     pass
 
 
+class OpenForm(BaseUpdateForm):
+    pass
+
+
+class CloseForm(BaseUpdateForm):
+    pass
+
+
 class RenewForm(BaseUpdateForm):
     pass
 

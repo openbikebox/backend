@@ -71,7 +71,7 @@ flask-run:
 migrate: config
 	$(FLASK_RUN) flask db upgrade
 
-# Create some test data including user accounts
+# Create some test data
 prepare-unittest:
 	$(FLASK_RUN) python -m tests.integration.helper.PrepareUnittest
 

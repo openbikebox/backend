@@ -20,7 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from enum import Enum
 from uuid import uuid4
-from typing import Union, TYPE_CHECKING
+from hashlib import sha256
+from typing import Union, List
 from datetime import datetime, timedelta
 from ..extensions import db
 from ..common.helpers import get_passcode, localize_datetime
@@ -31,6 +32,7 @@ from .resource import Resource
 from .location import Location
 from .operator import Operator
 from .pricegroup import Pricegroup
+from .hardware import AuthMethod
 
 
 class ActionStatus(Enum):
@@ -39,6 +41,13 @@ class ActionStatus(Enum):
     timeouted = 'timeouted'
     cancelled = 'cancelled'
     disrupted = 'disrupted'
+
+
+class PredefinedDaterange(Enum):
+    day = 'day'
+    week = 'week'
+    month = 'month'
+    year = 'year'
 
 
 class Action(db.Model, BaseModel):
@@ -71,9 +80,12 @@ class Action(db.Model, BaseModel):
     requested_at = db.Column(db.DateTime, info={'description': ''})
     valid_till = db.Column(db.DateTime, info={'description': ''})
     paid_at = db.Column(db.DateTime, info={'description': ''})
+    predefined_daterange = db.Column(db.Enum(PredefinedDaterange))
     begin = db.Column(db.DateTime, info={'description': ''})
     end = db.Column(db.DateTime, info={'description': ''})
     pin = db.Column(db.String(4))
+
+    _auth_methods = db.Column('auth_methods', db.Integer)
 
     status = db.Column(db.Enum(ActionStatus), default=ActionStatus.reserved, nullable=False, info={'description': ''})
 
@@ -106,6 +118,8 @@ class Action(db.Model, BaseModel):
     @property
     def code(self) -> Union[str, None]:
         if self.status != ActionStatus.booked:
+            return None
+        if AuthMethod.code not in self.auth_methods:
             return None
         return self.generate_code()
 
@@ -154,12 +168,29 @@ class Action(db.Model, BaseModel):
             return
         return localize_datetime(self.end)
 
+    def _get_auth_methods(self) -> List[AuthMethod]:
+        if not self._auth_methods:
+            return []
+        return sorted(
+            [item for item in list(AuthMethod) if item.value & self._auth_methods],
+            key=lambda item: item.value
+        )
+
+    def _set_auth_methods(self, auth_methods: List[AuthMethod]) -> None:
+        self._auth_methods = 0
+        for supported_auth_method in auth_methods:
+            self._auth_methods = self._auth_methods | supported_auth_method.value
+
+    auth_methods = db.synonym('_auth_methods', descriptor=property(_get_auth_methods, _set_auth_methods))
+
     @classmethod
-    def apiget(cls, uid, request_uid, session):
+    def apiget(cls, uid: str, request_uid: str, session: str, hashed: bool = False):
         result = cls.query.filter_by(uid=uid).first()
         if not result:
             raise BikeBoxNotExistingException()
-        if result.request_uid != request_uid or result.session != session:
+        if result.request_uid != request_uid:
+            raise BikeBoxAccessDeniedException()
+        if sha256(result.session.encode()).hexdigest() != session if hashed else result.session != session:
             raise BikeBoxAccessDeniedException()
         return result
 

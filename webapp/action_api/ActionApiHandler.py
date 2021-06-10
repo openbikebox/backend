@@ -25,9 +25,9 @@ from ..extensions import db
 from ..models import Action, Resource
 from ..common.response import error_response, success_response
 from ..enum import ActionStatus
-from ..common.helpers import get_now
+from ..common.helpers import get_now, send_json
 from ..common.exceptions import BikeBoxAccessDeniedException, BikeBoxNotExistingException
-from .ActionForms import ReserveForm, BookingForm, CancelForm, RenewForm, ExtendForm
+from .ActionForms import ReserveForm, BookingForm, CancelForm, RenewForm, ExtendForm, OpenForm, CloseForm
 from ..services.action.ActionHelper import calculate_price, calculate_begin_end, check_reservation_timeout_delay
 from ..services.resource.ResourceHelper import resource_free_between
 from ..services.resource.ResourceStatusService import update_resource_status_delay, update_resource_status
@@ -54,6 +54,7 @@ def action_reserve_handler(data: dict, source: str) -> dict:
     form.populate_obj(action, exclude=['begin', 'end'])
     action.begin = begin
     action.end = end
+    action.auth_methods = resource.hardware.supported_auth_methods
     action.set_cache(resource)
     if not calculate_price(action):
         return error_response('price not set for this daterange')
@@ -179,3 +180,31 @@ def action_extend_handler(data: dict, source: str):
 
     check_reservation_timeout_delay.apply_async((action.resource_id, action.id), countdown=60 * current_app.config['RESERVE_MINUTES'])
     return success_response(action.to_dict(extended=True, remove_none=True))
+
+
+def action_open_close_handler(data: dict, job: str):
+    form = OpenForm(data)
+    if not form.validate():
+        return error_response(form.errors)
+    try:
+        action = Action.apiget(form.uid.data, form.request_uid.data, form.session.data, hashed=True)
+    except BikeBoxNotExistingException:
+        return error_response('action does not exist')
+    if action.status != ActionStatus.booked:
+        return error_response('resource not booked')
+    if action.begin > get_now() or action.end < get_now():
+        return error_response('not in begin-end range')
+    result = send_json(
+        '%s/backend/resource/%s/change-status/%s' % (
+            current_app.config['OPENBIKEBOX_CONNECT_URL'],
+            action.resource_id,
+            job
+        ),
+        {},
+        'openbikebox-connect',
+        'cannot %s lock' % job,
+        auth=(current_app.config['OPENBIKEBOX_CONNECT_USER'], current_app.config['OPENBIKEBOX_CONNECT_PASSWORD'])
+    )
+    if result and result.get('status') == 0:
+        return success_response({})
+    return error_response()

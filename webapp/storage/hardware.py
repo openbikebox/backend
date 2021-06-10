@@ -18,8 +18,15 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from enum import Enum
+from typing import List
 from ..extensions import db
 from .base import BaseModel
+
+
+class AuthMethod(Enum):
+    code = 1 << 0
+    connect = 1 << 1
 
 
 class Hardware(db.Model, BaseModel):
@@ -30,4 +37,19 @@ class Hardware(db.Model, BaseModel):
 
     name = db.Column(db.String(255), info={'description': 'name'})
     future_booking = db.Column(db.Boolean)
+    _supported_auth_methods = db.Column('supported_auth_methods', db.Integer)
 
+    def _get_supported_auth_methods(self) -> List[AuthMethod]:
+        if not self._supported_auth_methods:
+            return []
+        return sorted(
+            [item for item in list(AuthMethod) if item.value & self._supported_auth_methods],
+            key=lambda item: item.value
+        )
+
+    def _set_supported_auth_methods(self, supported_auth_methods: List[AuthMethod]) -> None:
+        self._supported_auth_methods = 0
+        for supported_auth_method in supported_auth_methods:
+            self._supported_auth_methods = self._supported_auth_methods | supported_auth_method.value
+
+    supported_auth_methods = db.synonym('_supported_auth_methods', descriptor=property(_get_supported_auth_methods, _set_supported_auth_methods))

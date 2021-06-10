@@ -3,23 +3,24 @@
 ## Systemvoraussetzungen
 
 Bei der Anwendung handelt es sich um eine Flask-basierte Webanwendung mit folgenden Voraussetzungen:
-* Python 3.6+
-* Virtual Environment
-* SQLAlchemy-kompatibler SQL-Server (Tests aktuell: MariaDB, geplant: PostgreSQL)
+* Python 3.7+
+* SQLAlchemy-kompatibler SQL-Server (z.B. MariaDB)
 * Eine AMQP-Queue (z.B. RabbitMQ)
 
 
 ## Produktiv-Version auf einem Server
 
-// TODO
+1) Mit `virtualenv -p python3 venv` ein Virtual Environment erstellen
+2) Mit `./venv/bin/pip install -r requirements.txt` die nötigen Python-Pakete installieren
+3) `/webapp/config_dist_dev.py` zu `/webapp/config.py` umbenennen und anpassen  
+4) Mit `./venv/bin/flask db upgrade` die Datenbank initialisieren 
+5) Mit `./venv/bin/gunicorn "webapp.entry_point_gunicorn:app"` die Anwendung starten.
+6) Mit `./venv/bin/flask` OCHP- oder OCPI-Downloads anstossen 
 
 
 ## Entwicklungs-Version via docker
 
 1) `/webapp/config_dist_dev.py` zu `/webapp/config.py` umbenennen und anpassen
-2) In `/Dockerfile.flask` und `Dockerfile.webpack` uuid und guid anpassen
-3) Mit `docker-compose build` die Container bauen
-4) Mit `docker-compose up` die Container starten
-5) In einer anderen Shell sich via `docker exec -i -t open-bike-box-backend-flask /bin/bash` in den Flask-Docker-Kontext versetzen
-6) Mit `python manage.py db upgrade` die Datenbank initialisieren
-7) Mit `python manage.py prepare_unittest` Test-Daten in die Datenbank laden
+2) Mit `make` die Container bauen und starten
+3) Mit `make migrate` die Datenbank initialisieren
+4) Mit `make prepare-unittest` Beispieldaten in die Installation laden

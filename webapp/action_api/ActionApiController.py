@@ -23,7 +23,7 @@ from flask import Blueprint,  jsonify, request
 from ..extensions import api_documentation, auth
 from ..api_documentation.ApiDocumentation import EndpointTag
 from .ActionApiHandler import action_reserve_handler, action_cancel_handler, action_renew_handler, \
-    action_book_handler, action_extend_handler
+    action_book_handler, action_extend_handler, action_open_close_handler
 from ..common.response import log_request
 
 action_api = Blueprint('action_api', __name__, template_folder='templates')
@@ -97,3 +97,30 @@ def action_book():
 @log_request()
 def action_extend():
     return action_extend_handler(request.json, auth.username())
+
+
+@action_api.route('/api/v1/action/open', methods=['POST'])
+@api_documentation.register(
+    summary='remote-open a resource reservation',
+    tags=[EndpointTag.booking],
+    request_schema=os.path.join(os.path.dirname(os.path.realpath(__file__)), 'schema', 'open-request.json'),
+    response_schema=os.path.join(os.path.dirname(os.path.realpath(__file__)), 'schema', 'open-response.json'),
+    basic_auth=True
+)
+@log_request()
+def action_open():
+    return action_open_close_handler(request.json, 'open')
+
+
+@action_api.route('/api/v1/action/close', methods=['POST'])
+@api_documentation.register(
+    summary='remote-closes a resource reservation',
+    tags=[EndpointTag.booking],
+    request_schema=os.path.join(os.path.dirname(os.path.realpath(__file__)), 'schema', 'close-request.json'),
+    response_schema=os.path.join(os.path.dirname(os.path.realpath(__file__)), 'schema', 'close-response.json'),
+    basic_auth=True
+)
+@log_request()
+def action_close():
+    return action_open_close_handler(request.json, 'closed')
+

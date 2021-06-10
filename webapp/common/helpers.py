@@ -56,9 +56,7 @@ def localtime(value: Union[None, str, datetime]) -> str:
 
 def send_json(url: str, data: dict, log: str, message: str, auth: Optional[tuple] = None) -> Union[dict, None]:
     data = json.dumps(data, cls=DefaultJSONEncoder)
-    headers = {
-        'content-type': 'application/json'
-    }
+    headers = {'content-type': 'application/json'}
     try:
         kwargs = {}
         if auth:

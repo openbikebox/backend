@@ -51,7 +51,7 @@ class Location(db.Model, BaseModel):
     alerts = db.relationship('Alert', secondary=location_alert, backref=db.backref('locations', lazy='dynamic'))
 
     operator_id = db.Column(db.BigInteger, db.ForeignKey('operator.id', use_alter=True), info={'description': 'operator id'})
-    resource = db.relationship('Resource', backref='location', lazy='dynamic')
+    resource = db.relationship('Resource', backref='location_query', lazy='dynamic')
     resource_group = db.relationship('ResourceGroup', backref='location', lazy='dynamic')
     resource_access = db.relationship('ResourceAccess', backref='location', lazy='dynamic')
 

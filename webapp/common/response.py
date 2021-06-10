@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 import json
+from dataclasses import dataclass
 from lxml import etree
 from typing import Union, Optional
 from functools import update_wrapper
@@ -28,7 +29,7 @@ from ..extensions import logger
 from .helpers import DefaultJSONEncoder
 
 
-def json_response(data_dict: Union[dict, list], cors=False):
+def json_response(data_dict: Union[dict, list, dataclass()], cors=False):
     response = make_response(json.dumps(data_dict, cls=DefaultJSONEncoder))
     response.mimetype = 'application/json'
     if cors:
