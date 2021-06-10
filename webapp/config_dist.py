@@ -27,7 +27,6 @@ class Config(BaseConfig):
 
     ADMINS = ['admin@openbikebox.de']
     MAILS_FROM = 'no-reply@openbikebox.de'
-    ADMIN_URL = ''
 
     SECRET_KEY = 'please-insert-random-key'
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://please-insert-user:please-insert-password@mysql/please-insert-database'

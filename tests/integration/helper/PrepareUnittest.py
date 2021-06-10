@@ -140,12 +140,14 @@ def prepare_unittest():
     location_small = Location()
     location_small.type = LocationType.bikebox
     location_small.name = 'Fahrrad-Station Teststadt 1'
+    location_small.description = 'This is a wonderful description for Fahrrad-Station Teststadt 1'
     location_small.slug = 'fahrrad-station-teststadt'
     location_small.address = 'Königswall 15'
     location_small.postalcode = '44137'
     location_small.locality = 'Dortmund'
     location_small.country = 'de'
-    location_small.twentyforseven = True
+    location_small.twentyfourseven = True
+    location_small.booking_base_url = 'https://openbikebox.de'
     location_small.lat = 51.517477
     location_small.lon = 7.460547
     location_small.operator_id = operator_bike.id
@@ -165,12 +167,14 @@ def prepare_unittest():
     location_big = Location()
     location_small.type = LocationType.bikebox
     location_big.name = 'Fahrrad-Station Demostadt'
+    location_big.description = 'This is a wonderful description for Fahrrad-Station Demostadt'
     location_big.slug = 'fahrrad-station-demo'
     location_big.address = 'Kurt-Schumacher-Platz 1'
     location_big.postalcode = '44787'
     location_big.locality = 'Bochum'
     location_big.country = 'de'
-    location_big.twentyforseven = True
+    location_big.twentyfourseven = True
+    location_big.booking_base_url = 'https://openbikebox.de'
     location_big.lat = 51.479158
     location_big.lon = 7.222904
     location_big.operator_id = operator_bike.id
@@ -189,11 +193,13 @@ def prepare_unittest():
 
     location_cargo = Location()
     location_cargo.name = 'Cargo-Bike-Station'
+    location_big.description = 'This is a wonderful description for Cargo-Bike-Station'
     location_cargo.slug = 'cargo-bike-station'
     location_cargo.address = 'Bahnhofstraße 12'
     location_cargo.postalcode = '71083'
     location_cargo.locality = 'Herrenberg'
-    location_cargo.twentyforseven = False
+    location_cargo.booking_base_url = 'https://opencargobike.de'
+    location_cargo.twentyfourseven = False
     location_cargo.country = 'de'
     location_cargo.lat = 48.593811
     location_cargo.lon = 8.863288
@@ -334,6 +340,7 @@ def prepare_unittest():
         resource_cargo_photos.append(resource_cargo_photo)
 
     resource_cargo = Resource()
+    resource_cargo.description = 'this is a wonderful cargobike'
     resource_cargo.hardware_id = hardware_cargo.id
     resource_cargo.pricegroup_id = pricegroup.id
     resource_cargo.slug = str(uuid4())
