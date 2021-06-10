@@ -60,6 +60,7 @@ class Location(db.Model, BaseModel):
     name = db.Column(db.String(255), info={'description': 'public name'})
     slug = db.Column(db.String(255), index=True, unique=True, info={'description': 'slug'})
     type = db.Column(db.Enum(LocationType))
+    booking_base_url = db.Column(db.String(255))
 
     lat = db.Column(db.Numeric(precision=10, scale=7), info={'description': 'lat'})
     lon = db.Column(db.Numeric(precision=10, scale=7), info={'description': 'lon'})

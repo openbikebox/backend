@@ -115,7 +115,10 @@ def handle_gbfs_station_information(operator_id: int) -> GbfsResponse:
                 "cargobike_electric_assist": location.resource.count()
             },
             "rental_uris": {
-                "web": "%s/location/%s" % (operator.url, location.slug)
+                "web": "%s/location/%s" % (
+                    location.booking_base_url if location.booking_base_url else operator.url,
+                    location.slug
+                )
             }
         })
     return GbfsResponse(
