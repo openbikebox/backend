@@ -23,7 +23,7 @@ from wtfjson.util import UnsetValue
 from datetime import timedelta, datetime
 from ...models import Action, Pricegroup, Resource
 from ...common.helpers import get_current_time_local, unlocalize_datetime, localize_datetime
-from ...extensions import celery, db
+from ...extensions import celery, db, logger
 from ...enum import ActionStatus
 from ..resource.ResourceStatusService import update_resource_status
 
@@ -79,6 +79,7 @@ def check_reservation_timeout_delay(resource_id: int, action_id: int) -> None:
 
 def check_reservation_timeout(resource: Resource, action: Action):
     if action.status == ActionStatus.reserved:
+        logger.info('action.status', 'set action %s status from %s to %s' % (action.id, action.status, ActionStatus.timeouted))
         action.status = ActionStatus.timeouted
         db.session.add(action)
         db.session.commit()

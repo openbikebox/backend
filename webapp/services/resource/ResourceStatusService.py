@@ -40,6 +40,7 @@ def queue_status_checks():
         .filter_by(status=ActionStatus.booked)\
         .all()
     for action in actions:
+        logger.info('resource.status', 'queue action %s for resource status check' % action.id)
         eventually_queue_status_checks(action, begin, end)
 
 
@@ -50,13 +51,17 @@ def eventually_queue_status_checks(action: Action, begin: Optional[datetime] = N
         end = unlocalize_datetime((begin_local + timedelta(hours=25)).replace(hour=0))
     if begin <= action.begin <= end:
         if action.begin <= get_now():
+            logger.info('resource.status', 'check action %s for resource status at begin' % action.id)
             update_resource_status(action.resource_id)
         else:
+            logger.info('resource.status', 'delay check action %s for resource status at begin' % action.id)
             update_resource_status_delay.delay((action.resource_id,), eta=action.begin)
     if begin <= action.end <= end:
         if action.end <= get_now():
+            logger.info('resource.status', 'check action %s for resource status at end' % action.id)
             update_resource_status(action.resource_id)
         else:
+            logger.info('resource.status', 'delay check action %s for resource status at end' % action.id)
             update_resource_status_delay.delay((action.resource_id,), eta=action.end)
 
 
@@ -72,6 +77,7 @@ def update_resource_status(resource_id: Optional[int] = None, resource: Optional
     new_status = resource_status_at(resource.id, get_now())
     if resource.status == new_status:
         return
+    logger.info('resource.status', 'set resource %s status from %s to %s' % (resource.id, resource.status, new_status))
     resource.status = new_status
     db.session.add(resource)
     db.session.commit()

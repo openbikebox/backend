@@ -23,3 +23,4 @@ from .storage.action import ActionStatus
 from .storage.resource import ResourceStatus
 from .storage.alert import AlertType
 from .storage.location import LocationType
+from .storage.hardware import AuthMethod
