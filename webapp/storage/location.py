@@ -78,7 +78,7 @@ class Location(db.Model, BaseModel):
 
     @property
     def booking_url(self) -> str:
-        return '%s/location/%s' % (current_app.config['FRONTEND_URL'], self.slug)
+        return '%s/location/%s' % (self.booking_base_url, self.slug)
 
     @property
     def polygon_geojson(self) -> dict:
