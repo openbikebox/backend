@@ -49,8 +49,10 @@ def reputation_heartbeat() -> None:
     for key, value in redis.hscan_iter('reputation'):
         new_value = int(value) - 300
         if new_value < 0:
+            logger.info('reputation', 'delete reputation id %s' % key)
             redis.hdel('reputation', key)
         else:
+            logger.info('reputation', 'set reputation id %s to %s' % (key, new_value))
             redis.hset('reputation', key, new_value)
 
 

@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from flask import Blueprint
-from .reputation import reputation_heartbeat
+from .reputation import reputation_heartbeat, reputation_list
 
 reputation_cli = Blueprint('reputation', __name__)
 
@@ -27,3 +27,8 @@ reputation_cli = Blueprint('reputation', __name__)
 @reputation_cli.cli.command("heartbeat", help='heartbeat should run every 600 seconds')
 def cli_reputation_heartbeat():
     reputation_heartbeat()
+
+
+@reputation_cli.cli.command("list", help='lists all reputations')
+def cli_reputation_list():
+    reputation_list()
