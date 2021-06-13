@@ -159,8 +159,6 @@ def action_extend_handler(data: dict, source: str):
         return error_response('old action was not booked')
     if old_action.end < get_now():
         return error_response('old action already ended')
-    if form.begin.data and form.begin.data > (get_now() + timedelta(minutes=2)):
-        return error_response('extending booking infuture booking')
     autocalculated_end = (old_action.end + (old_action.end - old_action.begin) + timedelta(hours=1)).replace(hour=0)
     begin, end = calculate_begin_end(form.predefined_daterange.data, old_action.end, form.end.data or autocalculated_end)
     if not resource_free_between(resource.id, begin, end):
@@ -170,6 +168,7 @@ def action_extend_handler(data: dict, source: str):
     form.populate_obj(action, exclude=['begin', 'end'])
     action.begin = begin
     action.end = end
+    action.auth_methods = resource.hardware.supported_auth_methods
     action.set_cache(resource)
     if not calculate_price(action):
         return error_response('price not set for this daterange')

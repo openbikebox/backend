@@ -32,6 +32,11 @@ def queue_status_checks():
     """
     this is done every night to live-update status during day
     """
+    # check to clean up
+    for resource in Resource.query.all():
+        update_resource_status(resource)
+
+    # queue possible changes during day
     begin_local = get_local_now().replace(hour=0, minute=0, second=0, microsecond=0)
     begin = unlocalize_datetime(begin_local)
     end = unlocalize_datetime((begin_local + timedelta(hours=25)).replace(hour=0))
