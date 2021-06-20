@@ -1,0 +1,105 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Resource",
+  "type": "object",
+  "description": "resource object",
+  "properties": {
+    "id": {
+      "type": "integer",
+      "description": "unique resource id"
+    },
+    "id_url": {
+      "type": "string",
+      "description": "unique url for this resource"
+    },
+    "created": {
+      "type": "string",
+      "format": "date-time",
+      "description": "created at datetime"
+    },
+    "modified": {
+      "type": "string",
+      "format": "date-time",
+      "description": "modified at datetime"
+    },
+    "slug": {
+      "type": "string",
+      "maxLength": 255,
+      "description": "unique slug for resource"
+    },
+    "identifier": {
+      "type": "string",
+      "maxLength": 255,
+      "description": "user readable identifier for resource, usually not longer then 3 chars"
+    },
+    "maintenance_from": {
+      "type": "string",
+      "format": "date-time",
+      "description": "planned maintenance begin of this resource"
+    },
+    "maintenance_till": {
+      "type": "string",
+      "format": "date-time",
+      "description": "planned maintenance end of this resource"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["free", "taken", "reserved", "inactive", "faulted"],
+      "description": "status of resource"
+    },
+    "installed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "datetime when resource was installed"
+    },
+    "pricegroup": {
+      "type": "object",
+      "description": "pricegroup used at this resource",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "unique pricegroup id"
+        },
+        "id_url": {
+          "type": "string",
+          "description": "unique url for this pricegroup"
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time",
+          "description": "created at datetime"
+        },
+        "modified": {
+          "type": "string",
+          "format": "date-time",
+          "description": "modified at datetime"
+        },
+        "fee_hour": {
+          "type": "string",
+          "maxLength": 8,
+          "description": "fee by hour including taxes as a string representation of an decimal value with precision 7 and scale 4"
+        },
+        "fee_day": {
+          "type": "string",
+          "maxLength": 8,
+          "description": "fee by day including taxes as a string representation of an decimal value with precision 7 and scale 4"
+        },
+        "fee_week": {
+          "type": "string",
+          "maxLength": 8,
+          "description": "fee by week including taxes as a string representation of an decimal value with precision 7 and scale 4"
+        },
+        "fee_month": {
+          "type": "string",
+          "maxLength": 8,
+          "description": "fee by month including taxes as a string representation of an decimal value with precision 7 and scale 4"
+        },
+        "fee_year": {
+          "type": "string",
+          "maxLength": 8,
+          "description": "fee by year including taxes as a string representation of an decimal value with precision 7 and scale 4"
+        }
+      }
+    }
+  }
+}

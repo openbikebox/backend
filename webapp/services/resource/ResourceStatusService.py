@@ -34,7 +34,7 @@ def queue_status_checks():
     """
     # check to clean up
     for resource in Resource.query.all():
-        update_resource_status(resource)
+        update_resource_status(resource=resource)
 
     # queue possible changes during day
     begin_local = get_local_now().replace(hour=0, minute=0, second=0, microsecond=0)

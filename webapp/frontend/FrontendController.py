@@ -48,3 +48,8 @@ def status():
 @frontend.route('/browserconfig.xml')
 def browserconfig_xml():
     return render_template('browserconfig.xml')
+
+
+@frontend.route('/admin')
+def admin_html():
+    return render_template('admin.html')

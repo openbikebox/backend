@@ -206,7 +206,11 @@ class Action(db.Model, BaseModel):
             del result['pin']
         if extended:
             if self.resource:
-                result['resource'] = {'identifier': self.resource.user_identifier}
+                result['resource'] = {
+                    'identifier': self.resource.user_identifier
+                }
+                if self.resource.hardware_id:
+                    result['resource']['hardware'] = self.resource.hardware.to_dict()
             if self.location:
                 result['location'] = self.location.to_dict(
                     fields=['id', 'name', 'slug', 'lat', 'lon'],

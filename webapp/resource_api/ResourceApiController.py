@@ -22,11 +22,11 @@ import os
 from flask import Blueprint, jsonify, abort, request
 from flask_cors import cross_origin
 from ..common.response import svg_response
-from ..models import Location
+from ..models import Location, Resource
 from ..extensions import api_documentation
 from ..enum import LocationType
 from .ResourceApiHandler import locations_geojson, get_location_reply, locations_list, get_resource_action_reply, \
-    get_location_action_reply
+    get_location_action_reply, get_resource_reply
 from ..api_documentation.ApiDocumentation import EndpointTag
 
 resource_api = Blueprint('resource', __name__)
@@ -123,7 +123,7 @@ def api_location(location_id):
 
 @resource_api.route('/api/v1/location')
 @api_documentation.register(
-    summary='getting detail information about a single by other parameters',
+    summary='getting detail information about a single location by other parameters',
     tags=[EndpointTag.information],
     args=[
         {
@@ -161,6 +161,27 @@ def api_location_param():
     if request.args.get('format') == 'geojson':
         return jsonify(location.polygon_geojson)
     return jsonify(get_location_reply(location))
+
+
+@resource_api.route('/api/v1/resource')
+@api_documentation.register(
+    summary='getting detail information about a single resource by other parameters',
+    tags=[EndpointTag.information],
+    args=[
+        {
+            'name': 'slug',
+            'description': 'the slug which should be queried',
+            'schema': {
+                'type': 'string'
+            },
+            'required': True
+        }
+    ],
+    response_schema=os.path.join(os.path.dirname(os.path.realpath(__file__)), 'schema', 'resource-response.json')
+)
+@cross_origin()
+def api_resource_param():
+    return jsonify(get_resource_reply(Resource.query.filter_by(slug=request.args.get('slug')).first_or_404()))
 
 
 @resource_api.route('/api/v1/location/<int:location_id>/actions')

@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from typing import List
 from datetime import date
 from sqlalchemy import or_, and_
-from ..models import Location, Action
+from ..models import Location, Action, Resource
 from ..common.response import error_response, success_response
 from ..common.helpers import get_now
 from ..enum import ActionStatus
@@ -77,23 +77,32 @@ def get_location_reply(location: Location) -> dict:
     ], remove_none=True)
     result['resource'] = []
     for resource in location.resource:
-        item = resource.to_dict(fields=[
-            'id', 'id_url', 'created', 'modified', 'slug', 'user_identifier', 'maintenance_from', 'maintenance_till',
-            'status', 'installed_at', 'description'
-        ], remove_none=True)
-        item['pricegroup'] = resource.pricegroup.to_dict(ignore=['operator_id'], remove_none=True)
-        if resource.photo_id:
-            item['photo'] = resource.photo.to_dict(
-                fields=['id', 'id_url', 'created', 'modified', 'url', 'mimetype'],
-                remove_none=True
-            )
-        item['photos'] = [
-            photo.to_dict(fields=['id', 'id_url', 'created', 'modified', 'url', 'mimetype'], remove_none=True)
-            for photo in resource.photos
-        ]
-        item['predefined_dateranges'] = [item for item in ['day', 'week', 'month', 'year'] if getattr(resource.pricegroup, 'fee_%s' % item) is not None]
-        result['resource'].append(item)
+        result['resource'].append(get_resource_reply_raw(resource))
     return success_response(result)
+
+
+def get_resource_reply(resource: Resource):
+    return success_response(get_resource_reply_raw(resource))
+
+
+def get_resource_reply_raw(resource: Resource):
+    item = resource.to_dict(fields=[
+        'id', 'id_url', 'created', 'modified', 'slug', 'user_identifier', 'maintenance_from', 'maintenance_till',
+        'status', 'installed_at', 'description'
+    ], remove_none=True)
+    item['pricegroup'] = resource.pricegroup.to_dict(ignore=['operator_id'], remove_none=True)
+    if resource.photo_id:
+        item['photo'] = resource.photo.to_dict(
+            fields=['id', 'id_url', 'created', 'modified', 'url', 'mimetype'],
+            remove_none=True
+        )
+    item['photos'] = [
+        photo.to_dict(fields=['id', 'id_url', 'created', 'modified', 'url', 'mimetype'], remove_none=True)
+        for photo in resource.photos
+    ]
+    item['predefined_dateranges'] = [item for item in ['day', 'week', 'month', 'year'] if
+                                     getattr(resource.pricegroup, 'fee_%s' % item) is not None]
+    return item
 
 
 def get_location_action_reply(location_id: int, begin_str: str, end_str: str):
@@ -123,16 +132,16 @@ def get_location_action_reply(location_id: int, begin_str: str, end_str: str):
 
 
 def get_resource_action_reply(resource_id: int, begin_str: str, end_str: str) -> dict:
-    try:
-        begin = date.fromisoformat(begin_str)
-        end = date.fromisoformat(end_str)
-    except (ValueError, TypeError):
-        return error_response('invalid date')
+    #try:
+    #    begin = date.fromisoformat(begin_str)
+    #    end = date.fromisoformat(end_str)
+    #except (ValueError, TypeError):
+    #    return error_response('invalid date')
+#        .filter(Action.end > begin)\
+#        .filter(Action.begin < end)\
     actions = Action.query\
         .with_entities(Action.begin, Action.end)\
         .filter_by(resource_id=resource_id)\
-        .filter(Action.end > begin)\
-        .filter(Action.begin < end)\
         .filter(or_(
             Action.status == ActionStatus.booked,
             and_(Action.status == ActionStatus.reserved, Action.valid_till > get_now())
