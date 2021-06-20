@@ -139,7 +139,7 @@ class Action(db.Model, BaseModel):
         return self._resource
 
     @property
-    def pricegroup(self) -> Union['Resource', None]:
+    def pricegroup(self) -> Union['Pricegroup', None]:
         if not self._pricegroup:
             self._pricegroup = Pricegroup.query.get(self.pricegroup_id)
         return self._pricegroup

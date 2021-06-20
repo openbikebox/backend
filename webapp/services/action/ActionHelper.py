@@ -26,6 +26,7 @@ from ...common.helpers import get_current_time_local, unlocalize_datetime, local
 from ...extensions import celery, db, logger
 from ...enum import ActionStatus
 from ..resource.ResourceStatusService import update_resource_status
+from ...services.pricegroup.PriceCalculation import calculate_detailed_price
 
 
 predefined_daterange_def = {
@@ -39,7 +40,10 @@ predefined_daterange_def = {
 def calculate_price(action: Action) -> bool:
     if not action.resource or not action.operator or not action.begin or not action.end:
         return False
-    action.value_gross = getattr(action.pricegroup, 'fee_%s' % Pricegroup.get_timespan(action.begin, action.end))
+    if action.pricegroup.detailed_calculation:
+        action.value_gross = calculate_detailed_price(action.pricegroup, action.begin, action.end)
+    else:
+        action.value_gross = getattr(action.pricegroup, 'fee_%s' % Pricegroup.get_timespan(action.begin, action.end))
     if not action.value_gross:
         return False
     action.tax_rate = action.operator.tax_rate

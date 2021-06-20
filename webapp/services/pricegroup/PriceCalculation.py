@@ -24,7 +24,7 @@ from datetime import datetime
 from ...models import Pricegroup
 
 
-def calculate_price(pricegroup: Pricegroup, begin: datetime, end: datetime) -> Decimal:
+def calculate_detailed_price(pricegroup: Pricegroup, begin: datetime, end: datetime) -> Decimal:
     delta = end - begin
     hours = 0
     days = 0
