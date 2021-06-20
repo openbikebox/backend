@@ -18,6 +18,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import os
+import json
 import time
 from flask import Blueprint, current_app, render_template
 from ..models import Option
@@ -52,4 +54,13 @@ def browserconfig_xml():
 
 @frontend.route('/admin')
 def admin_html():
+    if os.path.isfile(os.path.join(current_app.config['STATIC_DIR'], 'webpack-assets.json')):
+        with open(os.path.join(current_app.config['STATIC_DIR'], 'webpack-assets.json')) as json_file:
+            data = json.load(json_file)
+            print(data)
+            return render_template(
+                'admin.html',
+                css_file=data.get('main', {}).get('css'),
+                js_file=data.get('main', {}).get('js')
+            )
     return render_template('admin.html')

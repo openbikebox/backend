@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from decimal import Decimal
 from datetime import datetime
 from tests.helper import BaseTestCase
-from webapp.services.pricegroup.PriceCalculation import calculate_price
+from webapp.services.pricegroup.PriceCalculation import calculate_detailed_price
 from webapp.models import Pricegroup
 
 
@@ -37,29 +37,29 @@ class PriceCalculationTest(BaseTestCase):
         return pricegroup
 
     def test_hours(self):
-        result = calculate_price(self.get_pricegroup(), datetime(2021, 7, 1, 12), datetime(2021, 7, 1, 14))
+        result = calculate_detailed_price(self.get_pricegroup(), datetime(2021, 7, 1, 12), datetime(2021, 7, 1, 14))
         assert result == Decimal('2')
 
     def test_days(self):
-        result = calculate_price(self.get_pricegroup(), datetime(2021, 7, 1, 12), datetime(2021, 7, 2, 12))
+        result = calculate_detailed_price(self.get_pricegroup(), datetime(2021, 7, 1, 12), datetime(2021, 7, 2, 12))
         assert result == Decimal('5')
 
     def test_weeks(self):
-        result = calculate_price(self.get_pricegroup(), datetime(2021, 7, 1, 12), datetime(2021, 7, 8, 12))
+        result = calculate_detailed_price(self.get_pricegroup(), datetime(2021, 7, 1, 12), datetime(2021, 7, 8, 12))
         assert result == Decimal('20')
 
     def test_hours_days(self):
-        result = calculate_price(self.get_pricegroup(), datetime(2021, 7, 1, 12), datetime(2021, 7, 2, 14))
+        result = calculate_detailed_price(self.get_pricegroup(), datetime(2021, 7, 1, 12), datetime(2021, 7, 2, 14))
         assert result == Decimal('7')
 
     def test_hours_days_overflow(self):
-        result = calculate_price(self.get_pricegroup(), datetime(2021, 7, 1, 12), datetime(2021, 7, 2, 22))
+        result = calculate_detailed_price(self.get_pricegroup(), datetime(2021, 7, 1, 12), datetime(2021, 7, 2, 22))
         assert result == Decimal('10')
 
     def test_days_weeks_overflow(self):
-        result = calculate_price(self.get_pricegroup(), datetime(2021, 7, 1, 12), datetime(2021, 7, 6, 0))
+        result = calculate_detailed_price(self.get_pricegroup(), datetime(2021, 7, 1, 12), datetime(2021, 7, 6, 0))
         assert result == Decimal('20')
 
     def test_hours_days_weeks(self):
-        result = calculate_price(self.get_pricegroup(), datetime(2021, 7, 1, 12), datetime(2021, 7, 9, 14))
+        result = calculate_detailed_price(self.get_pricegroup(), datetime(2021, 7, 1, 12), datetime(2021, 7, 9, 14))
         assert result == Decimal('27')

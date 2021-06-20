@@ -1,4 +1,5 @@
 stages:
+  - build
   - test
 
 default:
@@ -22,6 +23,18 @@ variables:
       alias: mysql
     - name: redis:latest
     - name: rabbitmq:latest
+
+# Build stage
+build-js:
+  stage: build
+  image:
+    name: node:12
+  artifacts:
+    paths:
+      - static
+  script:
+    - npm install --cache .npm --prefer-offline
+    - npm run build
 
 # Test stage
 test-pytest:

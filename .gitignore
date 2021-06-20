@@ -1,18 +1,21 @@
-config.py
 *.py[cod]
 .idea
 
-bin
-venv
-tmp
-temp
-logs
+/js-deployment-config.sh
+/webapp/config.py
 
-static/js
-static/css
-static/files
+/venv
+/tmp
+/temp
+/logs
+/node_modules
+/.npm
 
-js-deployment-config.sh
-webpack-assets.json
+/package-lock.json
+/static/js
+/static/css
+/static/files
+/static/fonts
+/static/webpack-assets.json
 
-webapp/plugins
+/webapp/plugins

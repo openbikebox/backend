@@ -1,26 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
     <meta charset="utf-8">
-    <title>Location Data</title>
+    <title>admin</title>
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-        }
-
-        #map {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 100%;
-        }
-    </style>
+    {% if css_file %}<link rel="stylesheet" type="text/css" href="{{ css_file }}" />{% endif %}
 </head>
 <body>
-<div id="map"></div>
-<script>
-
-</script>
+<div id="root"></div>
+{% if js_file %}<script type="text/javascript" src="{{ js_file }}"></script>{% endif %}
 </body>
