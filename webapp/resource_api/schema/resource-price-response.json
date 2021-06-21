@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Resource Actions",
+  "type": "array",
+  "description": "resource actions",
+  "items": {
+    "type": "object",
+    "properties": {
+      "begin": {
+        "type": "string",
+        "format": "date"
+      },
+      "end": {
+        "type": "string",
+        "format": "date"
+      }
+    }
+  }
+}

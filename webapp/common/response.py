@@ -50,7 +50,7 @@ def jsonify_success(data: Union[dict, list, str], count: Optional[int] = None) -
 
 
 def error_response(error: Union[dict, list, str] = 'common') -> dict:
-    return {'status': -1, 'error': error}
+    return {'status': 400, 'error': error}
 
 
 def jsonify_error(error: Union[dict, list, str] = 'common') -> Response:

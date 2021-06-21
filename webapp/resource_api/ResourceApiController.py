@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
+from datetime import datetime
 from flask import Blueprint, jsonify, abort, request
 from flask_cors import cross_origin
 from ..common.response import svg_response
@@ -26,15 +27,15 @@ from ..models import Location, Resource
 from ..extensions import api_documentation
 from ..enum import LocationType
 from .ResourceApiHandler import locations_geojson, get_location_reply, locations_list, get_resource_action_reply, \
-    get_location_action_reply, get_resource_reply
+    get_location_action_reply, get_resource_reply, get_resource_price_reply
 from ..api_documentation.ApiDocumentation import EndpointTag
 
-resource_api = Blueprint('resource', __name__)
+resource_api = Blueprint('resource', __name__, url_prefix='/api/v1')
 
 from . import ResourceApiCli
 
 
-@resource_api.route('/api/v1/locations')
+@resource_api.route('/locations')
 @api_documentation.register(
     summary='getting aggregated information about locations',
     tags=[EndpointTag.information],
@@ -85,7 +86,7 @@ def api_locations_geojson():
     return jsonify(locations_list(locations))
 
 
-@resource_api.route('/api/v1/location/<int:location_id>')
+@resource_api.route('/location/<int:location_id>')
 @api_documentation.register(
     summary='getting detail information about a single by id',
     tags=[EndpointTag.information],
@@ -121,7 +122,7 @@ def api_location(location_id):
     return jsonify(get_location_reply(location))
 
 
-@resource_api.route('/api/v1/location')
+@resource_api.route('/location')
 @api_documentation.register(
     summary='getting detail information about a single location by other parameters',
     tags=[EndpointTag.information],
@@ -163,7 +164,7 @@ def api_location_param():
     return jsonify(get_location_reply(location))
 
 
-@resource_api.route('/api/v1/resource')
+@resource_api.route('/resource')
 @api_documentation.register(
     summary='getting detail information about a single resource by other parameters',
     tags=[EndpointTag.information],
@@ -184,7 +185,7 @@ def api_resource_param():
     return jsonify(get_resource_reply(Resource.query.filter_by(slug=request.args.get('slug')).first_or_404()))
 
 
-@resource_api.route('/api/v1/location/<int:location_id>/actions')
+@resource_api.route('/location/<int:location_id>/actions')
 @api_documentation.register(
     summary='getting actions of location',
     tags=[EndpointTag.information],
@@ -216,7 +217,39 @@ def api_location_actions(location_id: int):
     return jsonify(get_location_action_reply(location_id, request.args.get('begin'), request.args.get('end')))
 
 
-@resource_api.route('/api/v1/resource/<int:resource_id>/actions')
+@resource_api.route('/resource/<int:resource_id>/price')
+@api_documentation.register(
+    summary='getting price of resource',
+    tags=[EndpointTag.information],
+    args=[
+        {
+            'name': 'begin',
+            'description': 'begin of daterange',
+            'schema': {
+                'type': 'string',
+                'format': 'date'
+            },
+            'required': True
+        },
+        {
+            'name': 'end',
+            'description': 'end of daterange',
+            'schema': {
+                'type': 'string',
+                'format': 'date'
+            },
+            'required': True
+
+        },
+    ],
+    response_schema=os.path.join(os.path.dirname(os.path.realpath(__file__)), 'schema', 'resource-price-response.json')
+)
+@cross_origin()
+def api_resource_price(resource_id: int):
+    return jsonify(get_resource_price_reply(resource_id, request.args.get('begin'), request.args.get('end')))
+
+
+@resource_api.route('/resource/<int:resource_id>/actions')
 @api_documentation.register(
     summary='getting actions of resource',
     tags=[EndpointTag.information],

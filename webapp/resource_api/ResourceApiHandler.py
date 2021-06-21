@@ -19,12 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from typing import List
-from datetime import date
+from datetime import datetime, date
 from sqlalchemy import or_, and_
 from ..models import Location, Action, Resource
 from ..common.response import error_response, success_response
 from ..common.helpers import get_now
 from ..enum import ActionStatus
+from ..services.pricegroup.PriceCalculation import calculate_detailed_price
 
 
 def locations_geojson(locations: List[Location]) -> dict:
@@ -139,6 +140,7 @@ def get_resource_action_reply(resource_id: int, begin_str: str, end_str: str) ->
     #    return error_response('invalid date')
 #        .filter(Action.end > begin)\
 #        .filter(Action.begin < end)\
+    resource = Resource.query.get_or_404(resource_id)
     actions = Action.query\
         .with_entities(Action.begin, Action.end)\
         .filter_by(resource_id=resource_id)\
@@ -154,3 +156,16 @@ def get_resource_action_reply(resource_id: int, begin_str: str, end_str: str) ->
             'end': action.end
         })
     return success_response(result)
+
+
+def get_resource_price_reply(resource_id: int, begin_str: str, end_str: str):
+    try:
+        begin = datetime.fromisoformat(begin_str)
+        end = datetime.fromisoformat(end_str)
+    except (ValueError, TypeError):
+        return error_response('invalid datetime')
+
+    resource = Resource.query.get_or_404(resource_id)
+    return success_response({
+        'value_gross': calculate_detailed_price(resource.pricegroup, begin, end)
+    })
