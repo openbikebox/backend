@@ -26,7 +26,8 @@ from flask import Flask, request, jsonify
 from .config import Config
 from .common.constants import BaseConfig
 from .common.filter import register_global_filters
-from .extensions import db, mail, celery, redis, cors, auth, migrate
+from .extensions import db, mail, celery, redis, cors, auth, migrate, login_manager
+from .models import User
 
 # Blueprints
 from .gbfs import gbfs_controller
@@ -37,6 +38,7 @@ from .action_api import action_api
 from .resource_api import resource_api
 from .api_documentation.Controller import api_documentation_blueprint
 from .common.reputation import reputation_cli
+from .api_admin import api_admin
 
 __all__ = ['launch']
 
@@ -48,7 +50,8 @@ BLUEPRINTS = [
     gbfs_controller,
     park_api_controller,
     tiles_controller,
-    reputation_cli
+    reputation_cli,
+    api_admin
 ]
 
 
@@ -88,6 +91,10 @@ def configure_extensions(app):
         if sha256(password.encode()).hexdigest() == app.config['BASICAUTH'][username]['password']:
             return username
 
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.query.get(user_id)
+    login_manager.init_app(app)
     cors.init_app(app)
     mail.init_app(app)
     celery.init_app(app)

@@ -88,8 +88,8 @@ def get_resource_reply(resource: Resource):
 
 def get_resource_reply_raw(resource: Resource):
     item = resource.to_dict(fields=[
-        'id', 'id_url', 'created', 'modified', 'slug', 'user_identifier', 'maintenance_from', 'maintenance_till',
-        'status', 'installed_at', 'description'
+        'id', 'id_url', 'created', 'modified', 'name', 'slug', 'user_identifier', 'maintenance_from',
+        'maintenance_till', 'status', 'installed_at', 'description'
     ], remove_none=True)
     item['pricegroup'] = resource.pricegroup.to_dict(ignore=['operator_id'], remove_none=True)
     if resource.photo_id:

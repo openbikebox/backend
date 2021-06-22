@@ -1,0 +1,15 @@
+{
+  "titles": {
+    "dashboard": {
+      "root": "Dashboard"
+    },
+    "locations": {
+      "root": "Standorte",
+      "resources": "Ressourcen"
+    },
+    "resources": {
+      "log": "Ressourcen-Log"
+    }
+  },
+  "show-account": "Account anzeigen"
+}

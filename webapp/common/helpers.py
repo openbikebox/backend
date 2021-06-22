@@ -54,7 +54,19 @@ def localtime(value: Union[None, str, datetime]) -> str:
     return value.strftime('%Y-%m-%dT%H:%M:%S')
 
 
-def send_json(url: str, data: dict, log: str, message: str, auth: Optional[tuple] = None) -> Union[dict, None]:
+def get_json(url: str, data: dict, log: str, message: str, auth: Optional[tuple] = None) -> Union[dict, None]:
+    try:
+        kwargs = {}
+        if auth:
+            kwargs['auth'] = auth
+        r = requests.get(url, params=data, **kwargs)
+        return r.json()
+    except (ConnectionError, NewConnectionError, JSONDecodeError):
+        logger.error(log, message)
+        return None
+
+
+def post_json(url: str, data: dict, log: str, message: str, auth: Optional[tuple] = None) -> Union[dict, None]:
     data = json.dumps(data, cls=DefaultJSONEncoder)
     headers = {'content-type': 'application/json'}
     try:

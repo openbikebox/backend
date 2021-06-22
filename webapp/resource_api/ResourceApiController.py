@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
-from datetime import datetime
 from flask import Blueprint, jsonify, abort, request
 from flask_cors import cross_origin
 from ..common.response import svg_response

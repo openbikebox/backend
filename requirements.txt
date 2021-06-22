@@ -1,7 +1,7 @@
 gunicorn
 Flask<2.0
 Flask-SQLAlchemy
-Flask-Script
+Flask-Login
 Flask-Migrate<3.0
 Flask-Mail
 Flask-WTF

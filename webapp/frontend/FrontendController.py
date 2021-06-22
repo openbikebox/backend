@@ -21,9 +21,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 import json
 import time
-from flask import Blueprint, current_app, render_template
+from flask import Blueprint, request, current_app, render_template, redirect
+from flask_login import current_user
 from ..models import Option
 from ..common.response import json_response
+from ..services.user.UserAuth import user_authenticate
 
 frontend = Blueprint('frontend', __name__, template_folder='templates')
 
@@ -52,8 +54,25 @@ def browserconfig_xml():
     return render_template('browserconfig.xml')
 
 
+@frontend.route('/login', methods=['GET', 'POST'])
+def login_html():
+    if current_user.is_authenticated:
+        return redirect('/admin')
+    if request.method == 'POST':
+        if user_authenticate(
+                request.form.get('email'),
+                request.form.get('password'),
+                request.headers.get('X-Forwarded-For', None)
+        ):
+            return redirect('/admin')
+    return render_template('login.html')
+
+
 @frontend.route('/admin')
-def admin_html():
+@frontend.route('/admin/<path:any_path>')
+def admin_html(any_path=None):
+    if not current_user.is_authenticated:
+        return redirect('/login')
     if os.path.isfile(os.path.join(current_app.config['STATIC_DIR'], 'webpack-assets.json')):
         with open(os.path.join(current_app.config['STATIC_DIR'], 'webpack-assets.json')) as json_file:
             data = json.load(json_file)

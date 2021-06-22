@@ -25,7 +25,7 @@ from ..extensions import db
 from ..models import Action, Resource
 from ..common.response import error_response, success_response
 from ..enum import ActionStatus
-from ..common.helpers import get_now, send_json
+from ..common.helpers import get_now, get_json
 from ..common.exceptions import BikeBoxAccessDeniedException, BikeBoxNotExistingException
 from .ActionForms import ReserveForm, BookingForm, CancelForm, RenewForm, ExtendForm, OpenForm, CloseForm
 from ..services.action.ActionHelper import calculate_price, calculate_begin_end, check_reservation_timeout_delay
@@ -193,8 +193,8 @@ def action_open_close_handler(data: dict, job: str):
         return error_response('resource not booked')
     if action.begin > get_now() or action.end < get_now():
         return error_response('not in begin-end range')
-    result = send_json(
-        '%s/backend/resource/%s/change-status/%s' % (
+    result = get_json(
+        '%s/api/v1/backend/resource/%s/change-status/%s' % (
             current_app.config['OPENBIKEBOX_CONNECT_URL'],
             action.resource_id,
             job

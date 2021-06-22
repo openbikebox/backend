@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <title>login</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <style>
+        body {
+            font: 18px Verdana;
+        }
+
+        .container {
+            margin: 0 auto;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .container label, .container input, .container button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            font-size: 18px;
+        }
+
+        .container input {
+            width: calc(100% - 20px);
+        }
+
+        .container label, .container button {
+            margin-top: 20px;
+        }
+
+    </style>
+</head>
+<body>
+<form action="/login" method="post" autocomplete="off">
+    <div class="container">
+        <label for="email">E-Mail</label>
+        <input type="text" placeholder="E-Mail" name="email" id="email">
+
+        <label for="password">Passwort</label>
+        <input type="password" placeholder="Passwort" name="password" id="password">
+
+        <button type="submit">login</button>
+    </div>
+</form>
+</body>

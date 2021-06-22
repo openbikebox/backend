@@ -19,41 +19,60 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import json
+from enum import Enum
 from passlib.hash import bcrypt
 from typing import List
-from ..extensions import db
+from flask_login import UserMixin, AnonymousUserMixin
+from ..extensions import db, login_manager
 from .base import BaseModel
 
 
-class User(db.Model, BaseModel):
+class UserRole(Enum):
+    admin = 'admin'
+    operator = 'operator'
+
+
+class AnonymousUser(AnonymousUserMixin):
+    id = None
+    states = []
+
+    def has_capability(self, *capabilities):
+        return False
+
+
+login_manager.anonymous_user = AnonymousUser
+
+
+class User(db.Model, BaseModel, UserMixin):
     __tablename__ = 'user'
 
+    role = db.Column(db.Enum(UserRole))
     operator_id = db.Column(db.BigInteger, db.ForeignKey('operator.id', use_alter=True), info={'description': 'operator id'})
 
-    _email = db.Column('email', db.String(255), unique=True, index=True, info={'description': ''})
-    _password = db.Column('password', db.String(255), nullable=False, info={'description': ''})
+    _email = db.Column('email', db.String(255), unique=True, index=True)
+    _password = db.Column('password', db.String(255), nullable=False)
 
-    login_datetime = db.Column(db.DateTime, info={'description': ''})
-    last_login_datetime = db.Column(db.DateTime, info={'description': ''})
-    login_ip = db.Column(db.String(64), info={'description': ''})
-    last_login_ip = db.Column(db.String(64), info={'description': ''})
-    failed_login_count = db.Column(db.Integer, info={'description': ''})
-    last_failed_login_count = db.Column(db.Integer, info={'description': ''})
+    login_datetime = db.Column(db.DateTime)
+    last_login_datetime = db.Column(db.DateTime)
+    login_ip = db.Column(db.String(64))
+    last_login_ip = db.Column(db.String(64))
+    failed_login_count = db.Column(db.Integer)
+    last_failed_login_count = db.Column(db.Integer)
 
-    firstname = db.Column(db.String(255), info={'description': ''})
-    lastname = db.Column(db.String(255), info={'description': ''})
-    company = db.Column(db.String(255), info={'description': ''})
-    address = db.Column(db.String(255), info={'description': ''})
-    postalcode = db.Column(db.String(255), info={'description': ''})
-    locality = db.Column(db.String(255), info={'description': ''})
-    country = db.Column(db.String(2), info={'description': ''})
+    first_name = db.Column(db.String(255))
+    last_name = db.Column(db.String(255))
+    company = db.Column(db.String(255))
+    address = db.Column(db.String(255))
+    postalcode = db.Column(db.String(255))
+    locality = db.Column(db.String(255))
+    country = db.Column(db.String(2))
 
-    language = db.Column(db.Enum('de', 'en'), default='de', info={'description': ''})
+    language = db.Column(db.Enum('de', 'en'), default='de')
 
-    phone = db.Column(db.String(255), info={'description': ''})
-    mobile = db.Column(db.String(255), info={'description': ''})
+    phone = db.Column(db.String(255))
+    mobile = db.Column(db.String(255))
 
-    _capabilities = db.Column('capabilities', db.Text, default='[]', info={'description': ''})
+    _capabilities = db.Column('capabilities', db.Text, default='[]')
 
     # force email to lower
     def _get_email(self) -> str:
