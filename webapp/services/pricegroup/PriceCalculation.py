@@ -25,20 +25,20 @@ from ...models import Pricegroup
 
 
 def calculate_detailed_price(pricegroup: Pricegroup, begin: datetime, end: datetime) -> Decimal:
-    delta = end - begin
+    total_seconds = ceil((end - begin).total_seconds() / 60 / 60) * 60 * 60
     hours = 0
     days = 0
     weeks = 0
 
     final_fnc = ceil
     if pricegroup.fee_hour is not None:
-        hours = final_fnc(delta.total_seconds() / 60 / 60) % 24
+        hours = final_fnc(total_seconds / 60 / 60) % 24
         final_fnc = floor
     if pricegroup.fee_day is not None:
-        days = final_fnc(delta.total_seconds() / 60 / 60 / 24) % 7
+        days = final_fnc(total_seconds / 60 / 60 / 24) % 7
         final_fnc = floor
     if pricegroup.fee_week is not None:
-        weeks = final_fnc(delta.total_seconds() / 60 / 60 / 24 / 7)
+        weeks = final_fnc(total_seconds / 60 / 60 / 24 / 7)
 
     if pricegroup.fee_hour and hours * pricegroup.fee_hour > pricegroup.fee_day:
         hours = 0
@@ -47,7 +47,6 @@ def calculate_detailed_price(pricegroup: Pricegroup, begin: datetime, end: datet
         hours = 0
         days = 0
         weeks += 1
-
     result = Decimal(0)
     if pricegroup.fee_hour is not None:
         result += hours * pricegroup.fee_hour
