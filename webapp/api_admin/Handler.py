@@ -45,3 +45,20 @@ def handle_location_messages(
         'cannot get messages',
         auth=(current_app.config['OPENBIKEBOX_CONNECT_USER'], current_app.config['OPENBIKEBOX_CONNECT_PASSWORD'])
     )
+
+
+def handle_resource_open_close(resource_id: int, job: str):
+    result = get_json(
+        '%s/api/v1/backend/resource/%s/change-status/%s' % (
+            current_app.config['OPENBIKEBOX_CONNECT_URL'],
+            resource_id,
+            job
+        ),
+        {},
+        'openbikebox-connect',
+        'cannot %s lock' % job,
+        auth=(current_app.config['OPENBIKEBOX_CONNECT_USER'], current_app.config['OPENBIKEBOX_CONNECT_PASSWORD'])
+    )
+    if result is None or result.get('status'):
+        return {'status': 'error', 'message': 'server error'}
+    return {'status': 'success'}

@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from flask import Blueprint, jsonify, request
 from flask_login import login_required, current_user
 from ..common.response import jsonify_success
-from .Handler import handle_location_messages
+from .Handler import handle_location_messages, handle_resource_open_close
 
 api_admin = Blueprint('api_admin', __name__, url_prefix='/api/admin/v1')
 
@@ -40,11 +40,23 @@ def api_user_info():
     })
 
 
-@api_admin.route('/resource/<int:location_id>/logs')
-def location_messages(location_id):
+@api_admin.route('/resource/<int:resource_id>/logs')
+@login_required
+def location_messages(resource_id):
     return jsonify(handle_location_messages(
-        location_id,
+        resource_id,
         request.args.get('page', 1, type=int),
         request.args.get('items_per_page', 25, type=int)
     ))
 
+
+@api_admin.route('/resource/<int:resource_id>/open', methods=['POST'])
+@login_required
+def resource_open(resource_id: int):
+    return jsonify(handle_resource_open_close(resource_id, 'open'))
+
+
+@api_admin.route('/resource/<int:resource_id>/close', methods=['POST'])
+@login_required
+def resource_close(resource_id: int):
+    return jsonify(handle_resource_open_close(resource_id, 'closed'))

@@ -134,7 +134,7 @@ const AsyncActionButton = (props) => {
             autoHideDuration={3000}
             anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
         >
-            <Alert severity="success">
+            <Alert severity={asyncButtonState[state]}>
                 {message}
             </Alert>
         </Snackbar>
