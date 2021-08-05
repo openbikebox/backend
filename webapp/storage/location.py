@@ -74,6 +74,9 @@ class Location(db.Model, BaseModel):
     osm_id = db.Column(db.BigInteger, info={'description': 'openstreetmap id'})
     twentyfourseven = db.Column(db.Boolean)
 
+    terms_and_conditions = db.Column(db.String(255))
+    bike_size_information = db.Column(db.Text)
+
     geometry = db.Column(Point(), nullable=False)
 
     @property

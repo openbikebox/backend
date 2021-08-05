@@ -79,6 +79,16 @@ def get_location_reply(location: Location) -> dict:
     result['resource'] = []
     for resource in location.resource:
         result['resource'].append(get_resource_reply_raw(resource))
+    result['photos'] = [location.photo.to_dict(
+        fields=['id', 'id_url', 'created', 'modified', 'url', 'mimetype'],
+        remove_none=True
+    )]
+    for resource_group in location.resource_group:
+        for photo in resource_group.images:
+            result['photos'].append(photo.to_dict(
+                fields=['id', 'id_url', 'created', 'modified', 'url', 'mimetype'],
+                remove_none=True
+            ))
     return success_response(result)
 
 

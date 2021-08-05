@@ -76,7 +76,6 @@ def admin_html(any_path=None):
     if os.path.isfile(os.path.join(current_app.config['STATIC_DIR'], 'webpack-assets.json')):
         with open(os.path.join(current_app.config['STATIC_DIR'], 'webpack-assets.json')) as json_file:
             data = json.load(json_file)
-            print(data)
             return render_template(
                 'admin.html',
                 css_file=data.get('main', {}).get('css'),
