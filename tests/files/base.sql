@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Erstellungszeit: 05. Aug 2021 um 16:43
+-- Erstellungszeit: 05. Aug 2021 um 16:46
 -- Server-Version: 10.3.11-MariaDB-1:10.3.11+maria~bionic
 -- PHP-Version: 7.2.14
 
@@ -11,6 +11,12 @@ SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
 
 --
 -- Datenbank: `open-bike-box-backend`
@@ -179,7 +185,10 @@ CREATE TABLE `location` (
 -- Daten für Tabelle `location`
 --
 
-;
+INSERT INTO `location` (`id`, `created`, `modified`, `operator_id`, `photo_id`, `name`, `slug`, `lat`, `lon`, `address`, `postalcode`, `locality`, `country`, `description`, `osm_id`, `geometry`, `type`, `twentyfourseven`, `booking_base_url`, `terms_and_conditions`, `bike_size_information`) VALUES
+(1, '2021-08-05 16:42:48', '2021-08-05 16:42:48', 1, 2, 'Fahrrad-Station Teststadt 1', 'fahrrad-station-teststadt', '51.5174770', '7.4605470', 'Königswall 15', '44137', 'Dortmund', 'de', 'This is a wonderful description for Fahrrad-Station Teststadt 1', NULL, '\0\0\0\0\0\0\0R·³¯<@jý¡ם@', 'bikebox', 1, 'https://openbikebox.de', NULL, NULL),
+(2, '2021-08-05 16:42:48', '2021-08-05 16:42:48', 1, 3, 'Fahrrad-Station Demostadt', 'fahrrad-station-demo', '51.4791580', '7.2229040', 'Kurt-Schumacher-Platz 1', '44787', 'Bochum', 'de', 'This is a wonderful description for Fahrrad-Station Demostadt', NULL, '\0\0\0\0\0\0\0򎡌U½I@ 8򀤜@', 'bikebox', 1, 'https://openbikebox.de', NULL, NULL),
+(3, '2021-08-05 16:42:48', '2021-08-05 16:42:48', 2, 4, 'Cargo-Bike-Station', 'cargo-bike-station', '48.5938110', '8.8632880', 'Bahnhofstraße 12', '71083', 'Herrenberg', 'de', 'This is a wonderful description for Cargo-Bike-Station', NULL, '\0\0\0\0\0\0\0¦´ÿLH@ú~✰º!@', 'cargobike', 0, 'https://opencargobike.de', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -876,3 +885,7 @@ ALTER TABLE `resource_group_image`
 ALTER TABLE `user`
   ADD CONSTRAINT `user_ibfk_1` FOREIGN KEY (`operator_id`) REFERENCES `operator` (`id`);
 COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
