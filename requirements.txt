@@ -24,5 +24,5 @@ mercantile
 lxml
 pytest
 click<8.0
-https://github.com/binary-butterfly/wtfjson/archive/refs/heads/master.tar.gz
+git+https://github.com/binary-butterfly/wtfjson@0.2.3#egg=wtfjson
 https://github.com/mapbox/vector-tile-base/archive/refs/heads/master.tar.gz
