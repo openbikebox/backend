@@ -34,6 +34,8 @@ from ..services.resource.ResourceStatusService import update_resource_status_del
 
 
 def action_reserve_handler(data: dict, source: str) -> dict:
+    if data.get('begin') == '':  # ugly bugfix because of bad requests
+        del data['begin']
     form = ReserveForm(data)
     if not form.validate():
         return error_response(form.errors)
