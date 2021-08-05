@@ -1,18 +1,21 @@
 FROM ubuntu:20.04
-ENV DEBIAN_FRONTEND noninteractive
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Europe/Berlin
 
 # Upgrade packages and install locales
 RUN echo "locales locales/default_environment_locale select en_US.UTF-8" | debconf-set-selections && \
     echo "locales locales/locales_to_be_generated select en_US.UTF-8 UTF-8" | debconf-set-selections && \
+    ln -sf /usr/share/zoneinfo/$TZ /etc/localtime && \
     apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y locales
+    apt-get install -y locales tzdata
 
 ENV LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8 \
     LANGUAGE=en_US:en
 
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONUNBUFFERED=1
 
 # Install commonly used packages
 RUN apt-get install -y \
@@ -24,12 +27,7 @@ RUN apt-get install -y \
         inotify-tools \
         wait-for-it \
         git \
-        wget \
-        tzdata
-
-ENV TZ=Europe/Berlin
-RUN ln -fs /usr/share/zoneinfo/Europe/Berlin /etc/localtime
-RUN dpkg-reconfigure --frontend noninteractive tzdata
+        wget
 
 RUN ln -s /usr/bin/python3 /usr/bin/python
 
