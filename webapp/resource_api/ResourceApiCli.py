@@ -34,6 +34,7 @@ def cli_queue_status_checks():
 @click.argument('pricegroup_id', type=int)
 @click.argument('resource_group_id', type=int)
 @click.argument('resource_access_id', type=int)
+@click.argument('hardware_id', type=int)
 @click.argument('start_x', type=int)
 @click.argument('start_y', type=int)
 @click.argument('max_x', type=int)

@@ -287,6 +287,11 @@
                 "maxLength": 8,
                 "description": "fee by month including taxes as a string representation of an decimal value with precision 7 and scale 4"
               },
+              "fee_quarter": {
+                "type": "string",
+                "maxLength": 8,
+                "description": "fee by quarter including taxes as a string representation of an decimal value with precision 7 and scale 4"
+              },
               "fee_year": {
                 "type": "string",
                 "maxLength": 8,

@@ -47,6 +47,7 @@ class PredefinedDaterange(Enum):
     day = 'day'
     week = 'week'
     month = 'month'
+    quarter = 'quarter'
     year = 'year'
 
 

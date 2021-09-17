@@ -43,7 +43,7 @@
     },
     "predefined_daterange": {
       "description": "a predefined daterange in order to let the backend calculate begin and end. either begin and end or predefined_range is required.",
-      "enum": ["day", "week", "month", "year"],
+      "enum": ["day", "week", "month", "quarter", "year"],
       "type": "string"
     },
     "user_identifier": {

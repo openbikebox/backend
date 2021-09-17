@@ -32,7 +32,7 @@ class ReserveForm(DictInput):
         accept_utc=True
     )
     predefined_daterange = StringField(
-        validators=[AnyOf(['day', 'week', 'month', 'year'])],
+        validators=[AnyOf(['day', 'week', 'month', 'quarter', 'year'])],
         required=False
     )
     begin = DateTimeField(required=False, accept_utc=True)
@@ -84,6 +84,6 @@ class ExtendForm(DictInput):
     )
     begin = DateTimeField(required=False, accept_utc=True)
     end = DateTimeField(required=False, accept_utc=True)
-    predefined_daterange = StringField(validators=[AnyOf(['day', 'week', 'month', 'year'])], required=False)
+    predefined_daterange = StringField(validators=[AnyOf(['day', 'week', 'month', 'quarter', 'year'])], required=False)
     user_identifier = StringField(required=False)
 

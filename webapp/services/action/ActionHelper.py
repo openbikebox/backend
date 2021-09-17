@@ -33,6 +33,7 @@ predefined_daterange_def = {
     'day': timedelta(days=1),
     'week': timedelta(days=7),
     'month': timedelta(days=31),
+    'quarter': timedelta(days=92),
     'year': timedelta(days=365)
 }
 
