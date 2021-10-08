@@ -43,6 +43,7 @@ def handle_park_api_operator(operator_id: int) -> dict:
             Location.lon,
             Location.slug,
             Location.address,
+            Location.photo_id,
             Location.booking_base_url,
             func.max(Resource.modified).label('resource_last_modified'),
             func.count(Resource.id).label('resource_count'),
@@ -74,6 +75,7 @@ def handle_park_api_operator(operator_id: int) -> dict:
                 "forecast": False,
                 "address": location.address,
                 "lot_type": "Fahrradabstellanlage",
+                "image_url": "%s/static/files/%s.jpg" % (current_app.config['PROJECT_URL'], location.photo_id),
                 "url": "%s/location/%s/" % (location.booking_base_url, location.slug)
             } for location in locations
         ]
