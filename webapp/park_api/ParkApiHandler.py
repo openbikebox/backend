@@ -66,7 +66,7 @@ def handle_park_api_operator(operator_id: int) -> dict:
                     "lat": float(location.lat),
                     "lng": float(location.lon)
                 },
-                "name": locations.name,
+                "name": location.name,
                 "total": location.resource_count,
                 "free": location.resource_free_count,
                 "state": "open",
