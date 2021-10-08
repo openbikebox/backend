@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from sqlalchemy import func, case
-from flask import abort
+from flask import abort, current_app
 from ..models import Location, Resource, Operator
 from ..enum import ResourceStatus
 
@@ -43,6 +43,7 @@ def handle_park_api_operator(operator_id: int) -> dict:
             Location.lon,
             Location.slug,
             Location.address,
+            Location.booking_base_url,
             func.max(Resource.modified).label('resource_last_modified'),
             func.count(Resource.id).label('resource_count'),
             func.count(case([(Resource.status == ResourceStatus.free, 1)])).label('resource_free_count')
@@ -58,14 +59,14 @@ def handle_park_api_operator(operator_id: int) -> dict:
             max([location.modified for location in locations]),
             max([location.resource_last_modified for location in locations])
         ]),
-        "data_source": "https://openbikebox.de",
+        "data_source": current_app.config['PROJECT_URL'],
         "lots": [
             {
                 "coords": {
                     "lat": float(location.lat),
                     "lng": float(location.lon)
                 },
-                "name": "Altmarkt",
+                "name": locations.name,
                 "total": location.resource_count,
                 "free": location.resource_free_count,
                 "state": "open",
@@ -73,7 +74,7 @@ def handle_park_api_operator(operator_id: int) -> dict:
                 "forecast": False,
                 "address": location.address,
                 "lot_type": "Fahrradabstellanlage",
-                "url": "https://openbikebox.de/"
+                "url": "%s/location/%s/" % (location.booking_base_url, location.slug)
             } for location in locations
         ]
     }
