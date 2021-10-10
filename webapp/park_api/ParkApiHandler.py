@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from sqlalchemy import func, case
 from flask import abort, current_app
-from ..models import Location, Resource, Operator
+from ..models import Location, Resource, Operator, Hardware
 from ..enum import ResourceStatus
 
 
@@ -45,12 +45,14 @@ def handle_park_api_operator(operator_id: int) -> dict:
             Location.address,
             Location.photo_id,
             Location.booking_base_url,
+            Hardware.lot_name,
             func.max(Resource.modified).label('resource_last_modified'),
             func.count(Resource.id).label('resource_count'),
             func.count(case([(Resource.status == ResourceStatus.free, 1)])).label('resource_free_count')
         )\
         .filter(Location.operator_id == operator_id)\
         .join(Resource, Resource.location_id == Location.id)\
+        .join(Hardware, Hardware.id == Resource.hardware_id)\
         .group_by(Location.id)\
         .all()
     if not len(list(locations)):
@@ -74,7 +76,7 @@ def handle_park_api_operator(operator_id: int) -> dict:
                 "id": location.slug,
                 "forecast": False,
                 "address": location.address,
-                "lot_type": "Fahrradabstellanlage",
+                "lot_type": location.lot_name,
                 "image_url": "%s/static/files/%s.jpg" % (current_app.config['PROJECT_URL'], location.photo_id),
                 "url": "%s/location/%s/" % (location.booking_base_url, location.slug)
             } for location in locations

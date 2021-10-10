@@ -36,6 +36,7 @@ class Hardware(db.Model, BaseModel):
     resource = db.relationship('Resource', backref='hardware', lazy='dynamic')
 
     name = db.Column(db.String(255), info={'description': 'name'})
+    lot_name = db.Column(db.String(192), index=True)
     future_booking = db.Column(db.Boolean)
     _supported_auth_methods = db.Column('supported_auth_methods', db.Integer)
 
