@@ -51,7 +51,7 @@ def action_reserve():
     response_schema=os.path.join(os.path.dirname(os.path.realpath(__file__)), 'schema', 'cancel-response.json'),
     basic_auth=True
 )
-@auth.login_required()
+#@auth.login_required()
 @log_request()
 def action_cancel():
     return jsonify(action_cancel_handler(request.json, auth.username()))
@@ -109,6 +109,7 @@ def action_extend():
 )
 @log_request()
 def action_open():
+    print()
     return action_open_close_handler(request.json, 'open')
 
 

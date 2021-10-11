@@ -21,7 +21,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from datetime import date
 from typing import Optional
 from flask import current_app
-from ..common.helpers import get_json
+from webapp.models import Action, Resource
+from webapp.common.helpers import get_json
+from webapp.extensions import db
+from webapp.enum import ResourceStatus
 
 
 def handle_location_messages(
@@ -47,7 +50,7 @@ def handle_location_messages(
     )
 
 
-def handle_resource_open_close(resource_id: int, job: str):
+def handle_resource_open_close(resource_id: int, job: str) -> dict:
     result = get_json(
         '%s/api/v1/backend/resource/%s/change-status/%s' % (
             current_app.config['OPENBIKEBOX_CONNECT_URL'],
@@ -62,3 +65,15 @@ def handle_resource_open_close(resource_id: int, job: str):
     if result is None or result.get('status'):
         return {'status': 'error', 'message': 'server error'}
     return {'status': 'success'}
+
+
+def handle_resource_clear(resource_id: int) -> dict:
+    resource = Resource.query.get(resource_id)
+    if not resource:
+        return {'status': 'error', 'message': 'not found'}
+    Action.query.filter(Action.resource_id == resource_id).delete(synchronize_session=False)
+    resource.status = ResourceStatus.free
+    db.session.add(resource)
+    db.session.commit()
+    return {'status': 'success'}
+

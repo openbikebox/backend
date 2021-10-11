@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from datetime import timedelta
 from wtfjson import DictInput
-from wtfjson.fields import IntegerField, StringField, DateTimeField, ListField, ObjectField
+from wtfjson.fields import IntegerField, StringField, DateTimeField, ListField, ObjectField, BooleanField
 from wtfjson.validators import NumberRange, Length, AnyOf, DateTimeRange
 
 
@@ -47,7 +47,7 @@ class BaseUpdateForm(DictInput):
 
 
 class CancelForm(BaseUpdateForm):
-    pass
+    booked = BooleanField(required=False)
 
 
 class OpenForm(BaseUpdateForm):

@@ -4,13 +4,13 @@ import TableCell from '@material-ui/core/TableCell';
 import ListIcon from '@material-ui/icons/List';
 import IconButton from '@material-ui/core/IconButton';
 import LockOpenIcon from '@material-ui/icons/LockOpen';
+import DeleteSweepIcon from '@material-ui/icons/DeleteSweep';
 import LockIcon from '@material-ui/icons/Lock';
 import PropTypes from "prop-types";
 import {Link} from 'react-router-dom';
 import {locationFullPropType, resourcePropType} from "../models";
 import AsyncActionButton from "../../components/AsyncActionButton";
 import {requestPost} from "../../Common";
-
 
 
 const ResourceRow = (props) => {
@@ -36,6 +36,12 @@ const ResourceRow = (props) => {
                 icon={LockIcon}
                 action={async () => {
                     return await requestPost('/api/admin/v1/resource/' + String(props.resource.id) + '/close', {})
+                }}
+            />
+            <AsyncActionButton
+                icon={DeleteSweepIcon}
+                action={async () => {
+                    return await requestPost('/api/admin/v1/resource/' + String(props.resource.id) + '/clear', {})
                 }}
             />
         </TableCell>

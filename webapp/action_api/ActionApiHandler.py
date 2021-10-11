@@ -75,14 +75,21 @@ def action_cancel_handler(data: dict, source: str) -> dict:
         return error_response(form.errors)
     try:
         action = Action.apiget(form.uid.data, form.request_uid.data, form.session.data)
+    except BikeBoxAccessDeniedException:
+        try:
+            action = Action.apiget(form.uid.data, form.request_uid.data, form.session.data, hashed=True)
+        except BikeBoxNotExistingException:
+            return error_response('action does not exist')
+        except BikeBoxAccessDeniedException:
+            return error_response('invalid credentials')
     except BikeBoxNotExistingException:
         return error_response('action does not exist')
     if action.status == ActionStatus.cancelled:
         return error_response('action already cancelled')
-    if action.status == ActionStatus.booked:
+    if action.status == ActionStatus.booked and form.booked.data is not True:
         return error_response('action already booked')
-    if action.source != source:
-        return error_response('invalid source')
+    #if action.source != source:
+    #    return error_response('invalid source')
     action.status = ActionStatus.cancelled
     db.session.add(action)
     db.session.commit()
