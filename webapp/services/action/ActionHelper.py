@@ -45,7 +45,7 @@ def calculate_price(action: Action) -> bool:
         action.value_gross = calculate_detailed_price(action.pricegroup, action.begin, action.end)
     else:
         action.value_gross = getattr(action.pricegroup, 'fee_%s' % Pricegroup.get_timespan(action.begin, action.end))
-    if not action.value_gross:
+    if action.value_gross is None:
         return False
     action.tax_rate = action.operator.tax_rate
     action.value_tax = action.value_gross / (1 + action.tax_rate) * action.tax_rate
