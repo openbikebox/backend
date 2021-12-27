@@ -245,6 +245,9 @@
             "format": "date-time",
             "description": "datetime when resource was installed"
           },
+          "hardware_id": {
+            "type": "integer"
+          },
           "pricegroup": {
             "type": "object",
             "description": "pricegroup used at this resource",
