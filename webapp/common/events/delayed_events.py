@@ -18,6 +18,16 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from .app import launch
+from webapp.dependencies import dependencies
+from webapp.extensions import celery
+from .enum import EventSource, EventType
 
-app = launch()
+
+@celery.task
+def trigger_delayed_event(event_type_str, event_source_str, event_id: int, **kwargs):
+    dependencies.get_event_helper().trigger_async(
+        event_type=EventType[event_type_str],
+        event_source=EventSource[event_source_str],
+        event_id=event_id,
+        **kwargs
+    )

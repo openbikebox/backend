@@ -2,12 +2,15 @@
 .idea
 
 /js-deployment-config.sh
-/webapp/config.py
+/config.yaml
 
 /venv
 /tmp
 /temp
 /logs
+!/logs/.gitkeep
+/export
+!/export/.gitkeep
 /node_modules
 /.npm
 

@@ -18,6 +18,23 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from .app import launch
+from typing import Optional
+from sqlalchemy.orm import Session
+from flask import current_app, Config
+from webapp.extensions import db
 
-app = launch()
+
+class UnsetValue:
+    pass
+
+
+unset_value = UnsetValue()
+
+
+class BaseRepository:
+    session: Session
+    config: Config
+
+    def __init__(self, session: Optional[Session] = None, config: Optional[Config] = None) -> None:
+        self.session = db.session if session is None else session
+        self.config = current_app.config if config is None else config

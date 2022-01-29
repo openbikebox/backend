@@ -23,11 +23,11 @@ import traceback
 from hashlib import sha256
 from flask import Flask, request, jsonify
 
-from .config import Config
-from .common.constants import BaseConfig
-from .common.filter import register_global_filters
-from .extensions import db, mail, celery, redis, cors, auth, migrate, login_manager
-from .models import User
+from webapp.common.misc import DefaultJSONEncoder
+from webapp.common.constants import BaseConfig
+from webapp.common.config import ConfigLoader
+from webapp.extensions import db, mail, celery, redis, cors, auth, migrate, login_manager
+from webapp.models import User
 
 # Blueprints
 from .gbfs import gbfs_controller
@@ -39,6 +39,8 @@ from .resource_api import resource_api
 from .api_documentation.Controller import api_documentation_blueprint
 from .common.reputation import reputation_cli
 from .api_admin import api_admin
+from .services.collector.cli import collector_blueprint
+
 
 __all__ = ['launch']
 
@@ -51,7 +53,8 @@ BLUEPRINTS = [
     park_api_controller,
     tiles_controller,
     reputation_cli,
-    api_admin
+    api_admin,
+    collector_blueprint
 ]
 
 
@@ -62,22 +65,20 @@ def launch():
         instance_relative_config=True,
         template_folder=os.path.join(BaseConfig.PROJECT_ROOT, 'templates')
     )
+    app.json_encoder = DefaultJSONEncoder
     configure_app(app)
     configure_hook(app)
     configure_blueprints(app)
     configure_extensions(app)
     configure_logging(app)
-    configure_filters(app)
     configure_error_handlers(app)
     load_plugins(app)
-    from .common import filter
     return app
 
 
 def configure_app(app):
-    app.config.from_object(Config)
-    app.config['MODE'] = os.getenv('APPLICATION_MODE', 'DEVELOPMENT')
-    print("Running in %s mode" % app.config['MODE'])
+    config_loader = ConfigLoader()
+    config_loader.configure_app(app)
 
 
 def configure_extensions(app):
@@ -104,10 +105,6 @@ def configure_extensions(app):
 def configure_blueprints(app):
     for blueprint in BLUEPRINTS:
         app.register_blueprint(blueprint)
-
-
-def configure_filters(app):
-    register_global_filters(app)
 
 
 def load_plugins(app):

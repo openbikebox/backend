@@ -60,6 +60,13 @@ class BaseConfig:
     MAIL_USE_SSL = False
     MAIL_USE_TLS = True
 
+    ENFORCE_CONFIG_VALUES = [
+        'PROJECT_URL',
+        'SECRET_KEY',
+        'SQLALCHEMY_DATABASE_URI',
+        'CELERY_BROKER_URL',
+    ]
+
     BASICAUTH = {}
     BASICAUTH_CAPABILITIES = {}
     TRUSTED_IPS = []

@@ -18,6 +18,20 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from .app import launch
+from typing import Any
 
-app = launch()
+from flask import Config, current_app
+
+
+class ConfigHelper:
+    """
+    Helper class that wraps the application config.
+    """
+
+    @staticmethod
+    def get_config() -> Config:
+        return current_app.config
+
+    @staticmethod
+    def get(key: str) -> Any:
+        return current_app.config.get(key)

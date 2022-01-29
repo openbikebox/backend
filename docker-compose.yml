@@ -1,4 +1,5 @@
-version: '3'
+version: '3.7'
+
 services:
   flask:
     build:
@@ -12,6 +13,8 @@ services:
       - mysql
       - rabbitmq
     user: ${CURRENT_UID}
+    environment:
+      FLASK_ENV: development
     command: ["python3", "runserver.py"]
 
   worker:
@@ -24,6 +27,8 @@ services:
       - mysql
       - rabbitmq
     user: ${CURRENT_UID}
+    environment:
+      FLASK_ENV: development
     command: ["/app/celery_dev.sh"]
 
   webpack:
@@ -42,7 +47,7 @@ services:
     container_name: open-bike-box-backend-mysql
     volumes:
       - .:/app
-      - open_bike_box_backend_mysql:/var/lib/mysql
+      - mysql:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: open-bike-box-backend
@@ -63,5 +68,5 @@ services:
     image: rabbitmq:latest
 
 volumes:
-  open_bike_box_backend_mysql:
+  mysql:
 

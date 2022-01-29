@@ -1,0 +1,30 @@
+PROJECT_URL: http://your-hostname:5000
+SCHEMA_URL: http://your-hostname:5000/schema
+
+DEBUG: true
+TESTING: true
+
+MAILS_FROM: no-reply@openbikebox.de
+ADMINS:
+  - admin@openbikebox.de
+
+SECRET_KEY: please-insert-random-key
+SQLALCHEMY_DATABASE_URI: mysql+pymysql://root:root@mysql/open-bike-box-backend
+SQLALCHEMY_ENGINE_OPTIONS:
+  pool_size: 100
+  pool_recycle: 600
+
+MAIL_SERVER: please-insert-mail-hostname
+MAIL_USERNAME: please-insert-mail-user
+MAIL_PASSWORD: please-insert-mail-password
+
+CELERY_BROKER_URL: amqp://rabbitmq
+SOCKETIO_QUEUE: amqp://rabbitmq
+REDIS_URL: redis://redis
+
+BASICAUTH:
+  integration-test:
+    password: b65ddb09c12204db12ab1c0548c85f70d7a3f71e1c8815cfb869a9b071719688  # integration-test
+    capabilities:
+      - 1
+      - 2

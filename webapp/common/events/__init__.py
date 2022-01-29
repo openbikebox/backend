@@ -18,6 +18,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from .app import launch
-
-app = launch()
+from .enum import EventType, EventSource
+from .event_helper import EventHelper
+from .event_receiver import EventReceiver

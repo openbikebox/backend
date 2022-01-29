@@ -18,6 +18,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from .app import launch
+from .base_repository import BaseRepository
 
-app = launch()
+
+class LocationRepository(BaseRepository):
+    pass

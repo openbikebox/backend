@@ -18,6 +18,23 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from .app import launch
+from enum import Enum
 
-app = launch()
+
+class EventSource(Enum):
+    WORDPRESS = 'WORDPRESS'
+    CLIENT = 'CLIENT'
+    FLOURIO = 'FLOURIO'
+    EVENT = 'EVENT'
+
+
+class EventType(Enum):
+    ORDER_CREATED = 'ORDER_CREATED'
+    ORDER_UPDATED = 'ORDER_UPDATED'
+    ORDER_COMPLETED = 'ORDER_COMPLETED'
+    ORDER_CANCELLED = 'ORDER_CANCELLED'
+    ORDER_TIMEOUT_CHECK = 'ORDER_TIMEOUT_CHECK'
+    STORE_OPEN = 'STORE_OPEN'
+    STORE_CLOSE = 'STORE_CLOSE'
+    PRODUCT_STOCK_EMPTY = 'PRODUCT_STOCK_EMPTY'
+
