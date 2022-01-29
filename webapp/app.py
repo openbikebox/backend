@@ -28,6 +28,7 @@ from webapp.common.constants import BaseConfig
 from webapp.common.config import ConfigLoader
 from webapp.extensions import db, mail, celery, redis, cors, auth, migrate, login_manager, logger
 from webapp.models import User
+from webapp.cli import register_cli_to_app
 
 # Blueprints
 from .gbfs import gbfs_controller
@@ -65,6 +66,7 @@ def launch():
     configure_app(app)
     configure_hook(app)
     configure_blueprints(app)
+    register_cli_to_app(app)
     configure_extensions(app)
     configure_logging(app)
     configure_error_handlers(app)

@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from hashlib import md5
 from flask import request, current_app, abort
-from ...extensions import redis, logger
+from webapp.extensions import redis, logger
 
 
 def reputation_add(count: int) -> None:

@@ -44,7 +44,6 @@ services:
 
   mysql:
     image: mariadb
-    container_name: open-bike-box-backend-mysql
     volumes:
       - .:/app
       - mysql:/var/lib/mysql
