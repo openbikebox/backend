@@ -31,8 +31,6 @@ from ..api_documentation.ApiDocumentation import EndpointTag
 
 resource_api = Blueprint('resource', __name__, url_prefix='/api/v1')
 
-from . import ResourceApiCli
-
 
 @resource_api.route('/locations')
 @api_documentation.register(

@@ -18,17 +18,12 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from flask import Blueprint
-from .reputation import reputation_heartbeat, reputation_list
 
-reputation_cli = Blueprint('reputation', __name__)
-
-
-@reputation_cli.cli.command("heartbeat", help='heartbeat should run every 600 seconds')
-def cli_reputation_heartbeat():
-    reputation_heartbeat()
+from flask import Flask
+from .cli_reputation import reputation_cli
+from .cli_resource import resource_cli
 
 
-@reputation_cli.cli.command("list", help='lists all reputations')
-def cli_reputation_list():
-    reputation_list()
+def register_cli_to_app(app: Flask):
+    app.cli.add_command(reputation_cli)
+    app.cli.add_command(resource_cli)

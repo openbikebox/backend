@@ -19,17 +19,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import click
-from ..services.resource.ResourceStatusService import queue_status_checks
-from ..services.resource.FillLocationService import fill_location
-from .ResourceApiController import resource_api
+from flask.cli import AppGroup
+from webapp.services.resource.ResourceStatusService import queue_status_checks
+from webapp.services.resource.FillLocationService import fill_location
 
 
-@resource_api.cli.command("queue_status_checks", help='should run a short time after midnight')
+resource_cli = AppGroup('resource')
+
+
+@resource_cli.command("queue_status_checks", help='should run a short time after midnight')
 def cli_queue_status_checks():
     queue_status_checks()
 
 
-@resource_api.cli.command("create")
+@resource_cli.command("create")
 @click.argument('location_id', type=int)
 @click.argument('pricegroup_id', type=int)
 @click.argument('resource_group_id', type=int)

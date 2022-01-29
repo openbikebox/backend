@@ -37,7 +37,6 @@ from .frontend import frontend
 from .action_api import action_api
 from .resource_api import resource_api
 from .api_documentation.Controller import api_documentation_blueprint
-from .common.reputation import reputation_cli
 from .api_admin import api_admin
 
 
@@ -51,7 +50,6 @@ BLUEPRINTS = [
     gbfs_controller,
     park_api_controller,
     tiles_controller,
-    reputation_cli,
     api_admin,
 ]
 

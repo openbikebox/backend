@@ -18,5 +18,17 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from .cli import reputation_cli
-from .reputation import reputation_add
+from flask.cli import AppGroup
+from webapp.common.reputation import reputation_heartbeat, reputation_list
+
+reputation_cli = AppGroup('reputation')
+
+
+@reputation_cli.command("heartbeat", help='heartbeat should run every 600 seconds')
+def cli_reputation_heartbeat():
+    reputation_heartbeat()
+
+
+@reputation_cli.command("list", help='lists all reputations')
+def cli_reputation_list():
+    reputation_list()
