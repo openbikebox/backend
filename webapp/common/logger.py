@@ -27,7 +27,11 @@ from flask_mail import Message
 
 
 class Logger:
+    config: Config
     registered_logs = []
+
+    def init_app(self, app: Flask):
+        self.config = app.config
 
     def get_log(self, log_name):
         logger = logging.getLogger(log_name)
@@ -36,7 +40,7 @@ class Logger:
         logger.setLevel(logging.INFO)
 
         # Init File Handler
-        file_name = os.path.join(current_app.config['LOG_DIR'], '%s.log' % log_name)
+        file_name = os.path.join(self.config['LOG_DIR'], '%s.log' % log_name)
         file_handler = WatchedFileHandler(file_name)
         file_handler.setLevel(logging.INFO)
         file_handler.setFormatter(logging.Formatter(
@@ -44,7 +48,7 @@ class Logger:
         )
         logger.addHandler(file_handler)
 
-        file_name = os.path.join(current_app.config['LOG_DIR'], '%s.err' % log_name)
+        file_name = os.path.join(self.config['LOG_DIR'], '%s.err' % log_name)
         file_handler = WatchedFileHandler(file_name)
         file_handler.setLevel(logging.ERROR)
         file_handler.setFormatter(logging.Formatter(
@@ -52,7 +56,7 @@ class Logger:
         )
         logger.addHandler(file_handler)
 
-        if current_app.config['DEBUG']:
+        if self.config['DEBUG']:
             console_handler = logging.StreamHandler()
             console_handler.setLevel(logging.DEBUG)
             console_format = logging.Formatter('%(message)s')

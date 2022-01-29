@@ -26,7 +26,7 @@ from flask import Flask, request, jsonify
 from webapp.common.misc import DefaultJSONEncoder
 from webapp.common.constants import BaseConfig
 from webapp.common.config import ConfigLoader
-from webapp.extensions import db, mail, celery, redis, cors, auth, migrate, login_manager
+from webapp.extensions import db, mail, celery, redis, cors, auth, migrate, login_manager, logger
 from webapp.models import User
 
 # Blueprints
@@ -78,6 +78,7 @@ def configure_app(app):
 
 
 def configure_extensions(app):
+    logger.init_app(app)
     db.init_app(app)
     migrate.init_app(app, db)
 
