@@ -39,7 +39,6 @@ from .resource_api import resource_api
 from .api_documentation.Controller import api_documentation_blueprint
 from .common.reputation import reputation_cli
 from .api_admin import api_admin
-from .services.collector.cli import collector_blueprint
 
 
 __all__ = ['launch']
@@ -54,7 +53,6 @@ BLUEPRINTS = [
     tiles_controller,
     reputation_cli,
     api_admin,
-    collector_blueprint
 ]
 
 
@@ -95,6 +93,7 @@ def configure_extensions(app):
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(user_id)
+
     login_manager.init_app(app)
     cors.init_app(app)
     mail.init_app(app)
