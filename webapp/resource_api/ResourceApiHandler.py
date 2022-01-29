@@ -111,7 +111,7 @@ def get_resource_reply_raw(resource: Resource):
         photo.to_dict(fields=['id', 'id_url', 'created', 'modified', 'url', 'mimetype'], remove_none=True)
         for photo in resource.photos
     ]
-    item['predefined_dateranges'] = [item for item in ['day', 'week', 'month', 'year'] if
+    item['predefined_dateranges'] = [item for item in ['day', 'week', 'month', 'quarter', 'year'] if
                                      getattr(resource.pricegroup, 'fee_%s' % item) is not None]
     return item
 
