@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 import logging
 from logging.handlers import WatchedFileHandler
-from flask import current_app
+from flask import current_app, Config, Flask
 from ..extensions import mail, celery
 from flask_mail import Message
 
