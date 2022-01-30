@@ -24,7 +24,8 @@ import os
 class BaseConfig:
     INSTANCE_FOLDER_PATH = os.path.join('/tmp', 'instance')
 
-    PROJECT_NAME = "open-bike-box-backend"
+    PROJECT_IDENTIFIER = "open-bike-box-backend"
+    PROJECT_NAME = 'openbikebox'
     PROJECT_VERSION = '1.0.0'
 
     PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
@@ -34,19 +35,16 @@ class BaseConfig:
     TEMP_DIR = os.path.abspath(os.path.join(PROJECT_ROOT, os.pardir, 'temp'))
     PLUGIN_DIR = os.path.abspath(os.path.join(PROJECT_ROOT, 'plugins'))
     TESTS_DIR = os.path.abspath(os.path.join(PROJECT_ROOT, os.pardir, 'tests'))
+    EXPORT_DIR = os.path.abspath(os.path.join(PROJECT_ROOT, os.pardir, 'export'))
 
     DEBUG = False
     TESTING = False
-    MAINTENANCE_MODE = False
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = False
 
     CELERY_BROKER_URL = 'amqp://localhost'
     REDIS_URL = 'redis://localhost'
-
-    BABEL_DEFAULT_LOCALE = 'de'
-    BABEL_DEFAULT_TIMEZONE = 'Europe/Berlin'
 
     MAPBOX_CENTER_LAT = 51.470915
     MAPBOX_CENTER_LON = 7.219874
@@ -57,7 +55,6 @@ class BaseConfig:
     REPUTATION_TRASHOLD = 600
 
     MAIL_PORT = 587
-    MAIL_USE_SSL = False
     MAIL_USE_TLS = True
 
     ENFORCE_CONFIG_VALUES = [

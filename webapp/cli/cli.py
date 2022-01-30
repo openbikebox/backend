@@ -22,8 +22,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from flask import Flask
 from .cli_reputation import reputation_cli
 from .cli_resource import resource_cli
+from .cli_action import action_cli
 
 
 def register_cli_to_app(app: Flask):
     app.cli.add_command(reputation_cli)
     app.cli.add_command(resource_cli)
+    app.cli.add_command(action_cli)

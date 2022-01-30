@@ -18,9 +18,18 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from .storage.resource_group import ResourceGroupStatus
-from .storage.action import ActionStatus, PredefinedDaterange
-from .storage.resource import ResourceStatus
-from .storage.alert import AlertType
-from .storage.location import LocationType
-from .storage.hardware import AuthMethod
+from flask_mail import Mail, Message
+
+
+class MailHelper:
+    """
+    this small helper class makes Flask-Mail dependency-injectable
+    """
+
+    mail: Mail
+
+    def __init__(self, mail: Mail):
+        self.mail = mail
+
+    def send(self, message: Message):
+        self.mail.send(message)

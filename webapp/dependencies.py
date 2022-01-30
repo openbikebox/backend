@@ -24,8 +24,10 @@ from sqlalchemy.orm import Session
 from webapp.common.config import ConfigHelper
 from webapp.common.remote_helper import RemoteHelper
 from webapp.common.celery import CeleryHelper
+from webapp.common.mail_helper import MailHelper
 from webapp.repositories import (
-    LocationRepository
+    LocationRepository,
+    ActionRepository,
 )
 
 if TYPE_CHECKING:
@@ -91,10 +93,18 @@ class Dependencies:
         )
 
     @cache_dependency
+    def get_mail_helper(self) -> MailHelper:
+        from webapp.extensions import mail
+        return MailHelper(
+            mail=mail
+        )
+
+
+    @cache_dependency
     def get_event_helper(self) -> 'EventHelper':
         from webapp.common.events import EventHelper
         return EventHelper(
-            celery_helper=self.get_celery_helper()
+            celery_helper=self.get_celery_helper(),
         )
 
     # Database
@@ -107,7 +117,13 @@ class Dependencies:
     @cache_dependency
     def get_location_repository(self) -> LocationRepository:
         return LocationRepository(
-            session=self.get_db_session()
+            session=self.get_db_session(),
+        )
+
+    @cache_dependency
+    def get_action_repository(self) -> ActionRepository:
+        return ActionRepository(
+            session=self.get_db_session(),
         )
 
 

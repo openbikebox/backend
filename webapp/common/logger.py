@@ -94,11 +94,11 @@ def send_notification(level, log_name, message, details):
         if current_app.config['DEBUG']:
             return
         msg = Message(
-            "%s %s Fehler" % (current_app.config['PROJECT_NAME'], current_app.config['MODE']),
+            "%s %s Fehler" % (current_app.config['PROJECT_IDENTIFIER'], current_app.config['MODE']),
             sender=current_app.config['MAILS_FROM'],
             recipients=current_app.config['ADMINS'],
             body="Auf %s %s ist im Bereich %s folgender Fehler der Klasse %s aufgetreten %s\n\nDetails:\n%s" % (
-                current_app.config['PROJECT_NAME'],
+                current_app.config['PROJECT_IDENTIFIER'],
                 current_app.config['MODE'],
                 log_name,
                 level,

@@ -1,0 +1,6 @@
+Hallo, {{ project_name }} Team,
+
+anbei befindet sich der Buchungs-Export von {{ begin }} bis {{ end }}.
+
+Viele Grüße,
+der {{ project_name }} Verwaltungsbot

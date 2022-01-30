@@ -57,7 +57,7 @@ BLUEPRINTS = [
 
 def launch():
     app = Flask(
-        BaseConfig.PROJECT_NAME,
+        BaseConfig.PROJECT_IDENTIFIER,
         instance_path=BaseConfig.INSTANCE_FOLDER_PATH,
         instance_relative_config=True,
         template_folder=os.path.join(BaseConfig.PROJECT_ROOT, 'templates')
