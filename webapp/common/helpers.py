@@ -29,7 +29,7 @@ from passlib.hash import bcrypt
 from random import SystemRandom
 from typing import Union, Optional
 from json.decoder import JSONDecodeError
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta, date, timezone
 from requests.exceptions import ConnectionError
 from urllib3.exceptions import NewConnectionError
 from dateutil.parser import parse as dateutil_parse
@@ -116,13 +116,17 @@ def slugify(text: str, delim: str = '-') -> str:
 def localize_datetime(value: datetime) -> Union[datetime, None]:
     if not value:
         return
-    return pytz.UTC.localize(value).astimezone(pytz.timezone('Europe/Berlin'))
+    if not value.tzinfo:
+        value = pytz.UTC.localize(value)
+    return value.astimezone(pytz.timezone('Europe/Berlin'))
 
 
 def unlocalize_datetime(value: datetime) -> Union[datetime, None]:
     if not value:
         return
-    return pytz.timezone('Europe/Berlin').localize(value).astimezone(pytz.UTC)
+    if not value.tzinfo:
+        value = pytz.timezone('Europe/Berlin').localize(value)
+    return value.astimezone(pytz.UTC)
 
 
 def get_now() -> datetime:
@@ -131,6 +135,10 @@ def get_now() -> datetime:
     :return: utc datetime
     """
     return datetime.utcnow()
+
+
+def get_utc_now() -> datetime:
+    return datetime.now(timezone.utc)
 
 
 def get_local_now() -> datetime:

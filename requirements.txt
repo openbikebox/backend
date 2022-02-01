@@ -29,5 +29,6 @@ SQLAlchemy-Utc~=0.14
 validataclass~=0.3
 click~=8.0
 setuptools~=59.7
-git+https://github.com/binary-butterfly/wtfjson@0.2.3#egg=wtfjson
+validataclass~=0.3
+SQLAlchemy-Utc~=0.14
 https://github.com/mapbox/vector-tile-base/archive/refs/heads/master.tar.gz

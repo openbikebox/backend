@@ -23,7 +23,7 @@ from sqlalchemy import and_, or_
 from typing import Optional, List
 from ...models import Action
 from ...enum import ActionStatus, ResourceStatus
-from ...common.helpers import get_now
+from ...common.helpers import get_now, get_utc_now
 
 
 def resource_free_between(
@@ -39,11 +39,12 @@ def resource_free_between(
         actions = actions.filter(Action.id.notin_(exclude_ids))
     return actions.filter(or_(
         Action.status == ActionStatus.booked,
-        and_(Action.status == ActionStatus.reserved, Action.valid_till > get_now())
+        and_(Action.status == ActionStatus.reserved, Action.valid_till > get_utc_now())
     )).count() == 0
 
 
 def resource_status_at(resource_id: int, moment: datetime) -> ResourceStatus:
+    print(moment)
     actions = Action.query \
         .with_entities(Action.id) \
         .filter(Action.resource_id == resource_id) \
@@ -51,6 +52,6 @@ def resource_status_at(resource_id: int, moment: datetime) -> ResourceStatus:
         .filter(Action.end >= moment) \
         .filter(or_(
             Action.status == ActionStatus.booked,
-            and_(Action.status == ActionStatus.reserved, Action.valid_till > get_now())
+            and_(Action.status == ActionStatus.reserved, Action.valid_till > get_utc_now())
         ))
     return ResourceStatus.free if actions.count() == 0 else ResourceStatus.taken

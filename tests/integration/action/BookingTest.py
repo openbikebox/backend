@@ -61,6 +61,7 @@ class BookingTest(BaseIntegrationTestCase):
                 'identifier': '%04d' % randint(0, 9999)
             }]
         }, 'integration-test')
+        print(booked)
         assert booked['status'] == 0
         assert booked['data']['request_uid'] == request_uid
         assert booked['data']['uid'] == uid

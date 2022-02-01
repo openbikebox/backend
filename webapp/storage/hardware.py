@@ -25,8 +25,14 @@ from .base import BaseModel
 
 
 class AuthMethod(Enum):
-    code = 1 << 0
-    connect = 1 << 1
+    code = 'code'
+    connect = 'connect'
+
+
+auth_method_ids = {
+    AuthMethod.code: 1 << 0,
+    AuthMethod.connect: 1 << 1
+}
 
 
 class Hardware(db.Model, BaseModel):
@@ -44,13 +50,13 @@ class Hardware(db.Model, BaseModel):
         if not self._supported_auth_methods:
             return []
         return sorted(
-            [item for item in list(AuthMethod) if item.value & self._supported_auth_methods],
-            key=lambda item: item.value
+            [item for item in list(AuthMethod) if auth_method_ids[item] & self._supported_auth_methods],
+            key=lambda item: auth_method_ids[item]
         )
 
     def _set_supported_auth_methods(self, supported_auth_methods: List[AuthMethod]) -> None:
         self._supported_auth_methods = 0
         for supported_auth_method in supported_auth_methods:
-            self._supported_auth_methods = self._supported_auth_methods | supported_auth_method.value
+            self._supported_auth_methods = self._supported_auth_methods | auth_method_ids[supported_auth_method]
 
     supported_auth_methods = db.synonym('_supported_auth_methods', descriptor=property(_get_supported_auth_methods, _set_supported_auth_methods))
