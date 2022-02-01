@@ -28,3 +28,9 @@ BASICAUTH:
     capabilities:
       - 1
       - 2
+
+REMOTE_SERVERS:
+  CONNECT:
+    url: http://srv:5001
+    user: unittest
+    password: unittest
