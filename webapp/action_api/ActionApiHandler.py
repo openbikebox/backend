@@ -37,7 +37,7 @@ from webapp.services.resource.ResourceStatusService import update_resource_statu
 
 reserve_validator: DataclassValidator[ReserveInput] = DataclassValidator(ReserveInput)
 cancel_validator: DataclassValidator[CancelInput] = DataclassValidator(CancelInput)
-renew_validator: DataclassValidator[RenewInput] = DataclassValidator(ReserveInput)
+renew_validator: DataclassValidator[RenewInput] = DataclassValidator(RenewInput)
 extend_validator: DataclassValidator[ExtendInput] = DataclassValidator(ExtendInput)
 booking_validator: DataclassValidator[BookingInput] = DataclassValidator(BookingInput)
 open_close_validator: DataclassValidator[OpenCloseInput] = DataclassValidator(OpenCloseInput)
