@@ -44,7 +44,6 @@ def resource_free_between(
 
 
 def resource_status_at(resource_id: int, moment: datetime) -> ResourceStatus:
-    print(moment)
     actions = Action.query \
         .with_entities(Action.id) \
         .filter(Action.resource_id == resource_id) \

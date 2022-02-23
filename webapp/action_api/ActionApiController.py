@@ -109,7 +109,6 @@ def action_extend():
 )
 @log_request()
 def action_open():
-    print()
     return action_open_close_handler(request.json, 'open')
 
 
