@@ -43,7 +43,7 @@ def cli_queue_status_checks():
 @click.argument('max_x', type=int)
 @click.argument('max_y', type=int)
 @click.argument('counter_length', type=int)
-@click.argument('space_direction', type=click.Choice(['x', 'y']))
+@click.argument('space_direction', type=click.Choice(['x', 'y', 'n']))
 def cli_fill_location(
         location_id,
         pricegroup_id,

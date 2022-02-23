@@ -93,6 +93,7 @@ class ActionExporterService(BaseService):
             PredefinedDaterange.month: 'Monat',
             PredefinedDaterange.quarter: 'Quartal',
             PredefinedDaterange.year: 'Jahr',
+            PredefinedDaterange.ten_years: '10 Jahre',
         }),
         'operator_id': FieldConfig(title='Betreiber: ID'),
         'operator_name': FieldConfig(title='Betreiber: Name'),

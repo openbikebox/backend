@@ -34,7 +34,8 @@ predefined_daterange_def = {
     PredefinedDaterange.week: timedelta(days=7),
     PredefinedDaterange.month: timedelta(days=31),
     PredefinedDaterange.quarter: timedelta(days=92),
-    PredefinedDaterange.year: timedelta(days=365)
+    PredefinedDaterange.year: timedelta(days=365),
+    PredefinedDaterange.ten_years: timedelta(days=3650),
 }
 
 

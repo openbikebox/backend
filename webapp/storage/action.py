@@ -50,6 +50,7 @@ class PredefinedDaterange(Enum):
     month = 'month'
     quarter = 'quarter'
     year = 'year'
+    ten_years = 'ten_years'
 
 
 class Action(db.Model, BaseModel):
