@@ -21,10 +21,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from typing import Optional
 from sqlalchemy import or_, and_
 from datetime import timedelta, datetime
-from ...common.helpers import get_local_now, get_now, unlocalize_datetime
-from ...storage import Resource, Action
-from ...enum import ActionStatus, ResourceStatus
-from ...extensions import celery, db, logger
+from webapp.common.helpers import get_local_now, get_now, unlocalize_datetime, get_utc_now
+from webapp.storage import Resource, Action
+from webapp.enum import ActionStatus, ResourceStatus
+from webapp.extensions import celery, db, logger
 from .ResourceHelper import resource_status_at
 
 
@@ -55,14 +55,14 @@ def eventually_queue_status_checks(action: Action, begin: Optional[datetime] = N
         begin = unlocalize_datetime(begin_local)
         end = unlocalize_datetime((begin_local + timedelta(hours=25)).replace(hour=0))
     if begin <= action.begin <= end:
-        if action.begin <= get_now():
+        if action.begin <= get_utc_now():
             logger.info('resource.status', 'check action %s for resource status at begin' % action.id)
             update_resource_status(action.resource_id)
         else:
             logger.info('resource.status', 'delay check action %s for resource status at begin' % action.id)
             update_resource_status_delay.delay((action.resource_id,), eta=action.begin)
     if begin <= action.end <= end:
-        if action.end <= get_now():
+        if action.end <= get_utc_now():
             logger.info('resource.status', 'check action %s for resource status at end' % action.id)
             update_resource_status(action.resource_id)
         else:
@@ -79,7 +79,7 @@ def update_resource_status(resource_id: Optional[int] = None, resource: Optional
     resource = Resource.query.get(resource_id) if resource is None else resource
     if resource.status in [ResourceStatus.faulted, ResourceStatus.inactive]:
         return
-    new_status = resource_status_at(resource.id, get_now())
+    new_status = resource_status_at(resource.id, get_utc_now())
     if resource.status == new_status:
         return
     logger.info('resource.status', 'set resource %s status from %s to %s' % (resource.id, resource.status, new_status))

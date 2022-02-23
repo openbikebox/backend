@@ -19,22 +19,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from typing import Union
-from wtfjson.util import UnsetValue
+from validataclass.helpers import UnsetValue
 from datetime import timedelta, datetime
-from ...models import Action, Pricegroup, Resource
-from ...common.helpers import get_current_time_local, unlocalize_datetime, localize_datetime
-from ...extensions import celery, db, logger
-from ...enum import ActionStatus
-from ..resource.ResourceStatusService import update_resource_status
-from ...services.pricegroup.PriceCalculation import calculate_detailed_price
+from webapp.models import Action, Pricegroup, Resource
+from webapp.common.helpers import get_current_time_local, unlocalize_datetime, localize_datetime
+from webapp.extensions import celery, db, logger
+from webapp.enum import ActionStatus, PredefinedDaterange
+from webapp.services.resource.ResourceStatusService import update_resource_status
+from webapp.services.pricegroup.PriceCalculation import calculate_detailed_price
 
 
 predefined_daterange_def = {
-    'day': timedelta(days=1),
-    'week': timedelta(days=7),
-    'month': timedelta(days=31),
-    'quarter': timedelta(days=92),
-    'year': timedelta(days=365)
+    PredefinedDaterange.day: timedelta(days=1),
+    PredefinedDaterange.week: timedelta(days=7),
+    PredefinedDaterange.month: timedelta(days=31),
+    PredefinedDaterange.quarter: timedelta(days=92),
+    PredefinedDaterange.year: timedelta(days=365),
+    PredefinedDaterange.ten_years: timedelta(days=3650),
 }
 
 
@@ -54,22 +55,21 @@ def calculate_price(action: Action) -> bool:
 
 
 def calculate_begin_end(
-        predefined_daterange: Union[UnsetValue, str],
+        predefined_daterange: Union[UnsetValue, PredefinedDaterange],
         begin: Union[UnsetValue, datetime],
         end: Union[UnsetValue, datetime]) -> [Union[None, datetime], Union[None, datetime]]:
     if begin and end:
         return begin, end
     if not begin and end:
-        return unlocalize_datetime(get_current_time_local().replace(microsecond=0)).replace(tzinfo=None), end
-
+        return unlocalize_datetime(get_current_time_local().replace(microsecond=0)), end
     if begin:
-        begin_local = localize_datetime(begin).replace(tzinfo=None)
+        begin_local = localize_datetime(begin)
     else:
         begin_local = get_current_time_local().replace(microsecond=0)
-        begin = unlocalize_datetime(begin_local).replace(tzinfo=None)
+        begin = unlocalize_datetime(begin_local)
     end_local = (begin_local + predefined_daterange_def[predefined_daterange] + timedelta(days=1, hours=1))\
         .replace(hour=0, minute=0, second=0)
-    end = unlocalize_datetime(end_local).replace(tzinfo=None)
+    end = unlocalize_datetime(end_local)
     return begin, end
 
 

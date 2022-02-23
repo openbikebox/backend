@@ -23,16 +23,17 @@ from uuid import uuid4
 from hashlib import sha256
 from typing import Union, List
 from datetime import datetime, timedelta
-from ..extensions import db
-from ..common.helpers import get_passcode, localize_datetime
-from ..common.exceptions import BikeBoxAccessDeniedException, BikeBoxNotExistingException
+from sqlalchemy_utc import UtcDateTime
+from webapp.extensions import db
+from webapp.common.helpers import get_passcode, localize_datetime
+from webapp.common.exceptions import BikeBoxAccessDeniedException, BikeBoxNotExistingException
 from .base import BaseModel
 from .resource_access import ResourceAccess
 from .resource import Resource
 from .location import Location
 from .operator import Operator
 from .pricegroup import Pricegroup
-from .hardware import AuthMethod
+from .hardware import AuthMethod, auth_method_ids
 
 
 class ActionStatus(Enum):
@@ -49,6 +50,7 @@ class PredefinedDaterange(Enum):
     month = 'month'
     quarter = 'quarter'
     year = 'year'
+    ten_years = 'ten_years'
 
 
 class Action(db.Model, BaseModel):
@@ -78,12 +80,12 @@ class Action(db.Model, BaseModel):
     pricegroup_cache = db.Column(db.Text)
     operator_cache = db.Column(db.Text)
 
-    requested_at = db.Column(db.DateTime, info={'description': ''})
-    valid_till = db.Column(db.DateTime, info={'description': ''})
-    paid_at = db.Column(db.DateTime, info={'description': ''})
+    requested_at = db.Column(UtcDateTime(), info={'description': ''})
+    valid_till = db.Column(UtcDateTime(), info={'description': ''})
+    paid_at = db.Column(UtcDateTime(), info={'description': ''})
     predefined_daterange = db.Column(db.Enum(PredefinedDaterange))
-    begin = db.Column(db.DateTime, info={'description': ''})
-    end = db.Column(db.DateTime, info={'description': ''})
+    begin = db.Column(UtcDateTime(), info={'description': ''})
+    end = db.Column(UtcDateTime(), info={'description': ''})
     pin = db.Column(db.String(4))
 
     _auth_methods = db.Column('auth_methods', db.Integer)
@@ -173,14 +175,14 @@ class Action(db.Model, BaseModel):
         if not self._auth_methods:
             return []
         return sorted(
-            [item for item in list(AuthMethod) if item.value & self._auth_methods],
-            key=lambda item: item.value
+            [item for item in list(AuthMethod) if auth_method_ids[item] & self._auth_methods],
+            key=lambda item: auth_method_ids[item]
         )
 
     def _set_auth_methods(self, auth_methods: List[AuthMethod]) -> None:
         self._auth_methods = 0
         for supported_auth_method in auth_methods:
-            self._auth_methods = self._auth_methods | supported_auth_method.value
+            self._auth_methods = self._auth_methods | auth_method_ids[supported_auth_method]
 
     auth_methods = db.synonym('_auth_methods', descriptor=property(_get_auth_methods, _set_auth_methods))
 

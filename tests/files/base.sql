@@ -53,7 +53,7 @@ CREATE TABLE `action` (
   `source` varchar(128) COLLATE utf8_unicode_ci DEFAULT NULL,
   `user_identifier` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `auth_methods` int(11) DEFAULT NULL,
-  `predefined_daterange` enum('day','week','month','quarter','year') CHARACTER SET utf8 DEFAULT NULL
+  `predefined_daterange` enum('day','week','month','quarter','year', 'ten_years') CHARACTER SET utf8 DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -272,15 +272,16 @@ CREATE TABLE `pricegroup` (
   `fee_year` decimal(7,4) DEFAULT NULL,
   `detailed_calculation` tinyint(1) DEFAULT NULL,
   `max_booking_time` int(11) DEFAULT NULL,
-  `fee_quarter` decimal(7,4) DEFAULT NULL
+  `fee_quarter` decimal(7,4) DEFAULT NULL,
+  `fee_ten_years` decimal(7,4) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Daten für Tabelle `pricegroup`
 --
 
-INSERT INTO `pricegroup` (`id`, `created`, `modified`, `operator_id`, `fee_hour`, `fee_day`, `fee_week`, `fee_month`, `fee_year`, `detailed_calculation`, `max_booking_time`, `fee_quarter`) VALUES
-(1, '2021-10-11 13:04:58', '2021-10-11 13:04:58', NULL, '0.2000', '1.0000', '5.0000', '15.0000', '100.0000', NULL, NULL, '0.0000');
+INSERT INTO `pricegroup` (`id`, `created`, `modified`, `operator_id`, `fee_hour`, `fee_day`, `fee_week`, `fee_month`, `fee_year`, `fee_ten_years`, `detailed_calculation`, `max_booking_time`, `fee_quarter`) VALUES
+(1, '2021-10-11 13:04:58', '2021-10-11 13:04:58', NULL, '0.2000', '1.0000', '5.0000', '15.0000', '100.0000', '400.0000', NULL, NULL, '0.0000');
 
 -- --------------------------------------------------------
 

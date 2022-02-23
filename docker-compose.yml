@@ -59,6 +59,7 @@ services:
       PMA_USER: root
       PMA_PASSWORD: root
       PMA_HOST: mysql
+      UPLOAD_LIMIT: 512M
 
   redis:
     image: redis
