@@ -50,5 +50,5 @@ def cli_queue_status_checks(begin: Optional[date] = None, end: Optional[date] = 
         begin=begin,
         end=end,
         file_name=file_name,
-        recipients=recipients or dependencies.get_config_helper().get('ADMINS'),
+        recipients=recipients or dependencies.get_config_helper().get('SUMMARY_RECIPIENTS'),
     )
