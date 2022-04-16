@@ -41,6 +41,7 @@ class RemoteServer:
     url: str
     user: str
     password: str
+    cert: Optional[str] = None
 
 
 class RemoteException(Exception):
@@ -69,14 +70,15 @@ class RemoteHelper:
                 **({} if json_data is None else {'data': json_data}),
                 headers={
                     'content-type': 'application/json'
-                }
+                },
+                verify=remote_server.cert,
             )
             self.logger.info('server.external', "%s %s: HTTP %s%s\n<< %s" % (
                 url,
                 method,
                 response.status_code,
                 "\n>> %s" % json_data if method in ['post', 'put', 'patch'] and json_data else '',
-                response.text
+                response.text,
             ))
             try:
                 if response.status_code not in [200, 201]:
@@ -93,7 +95,7 @@ class RemoteHelper:
         return self.request('get', self.config_helper.get('REMOTE_SERVERS')[remote_server_type], path)
 
     def post(self, remote_server_type: RemoteServerType, path: str, data: dict):
-        return self.request('put', self.config_helper.get('REMOTE_SERVERS')[remote_server_type], path, data)
+        return self.request('post', self.config_helper.get('REMOTE_SERVERS')[remote_server_type], path, data)
 
     def put(self, remote_server_type: RemoteServerType, path: str, data: dict):
         return self.request('put', self.config_helper.get('REMOTE_SERVERS')[remote_server_type], path, data)
