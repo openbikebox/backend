@@ -24,7 +24,7 @@ from uuid import uuid4
 from decimal import Decimal
 from dataclasses import dataclass
 from typing import List, Optional, Any
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 from openpyxl import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.utils import get_column_letter
@@ -123,7 +123,7 @@ class ActionExporterService(BaseService):
         ws.title = 'Export %s - %s' % (begin.strftime('%d.%m.%Y'), end.strftime('%d.%m.%Y'))
         actions = self.action_repository.fetch_exportable_actions(
             begin=unlocalize_datetime(datetime.combine(begin, time(0))),
-            end=unlocalize_datetime(datetime.combine(end, time(0))),
+            end=unlocalize_datetime(datetime.combine(end, time(0)) + timedelta(days=1)),
         )
         self.add_header_row(ws=ws)
         row = 2
